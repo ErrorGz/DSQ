@@ -634,8 +634,9 @@ class Blueprint {
     this.sorters = {};
     // 每个生产建筑的槽位分配器状态，供 generateConveyorBelts 追加分拣器时复用
     this.buildingAlloc = {};
-    // 槽位耗尽的建筑，避免重复告警
+    // 已告警过的槽位耗尽 / 自动升档，避免同类建筑刷屏
     this.slotExhaustedWarned = new Set();
+    this.upgradeWarned = new Set();
     this.sprayCoaterOffsetList = [];
     this.itemSummary = {};
     this.conveyorStartOffsetX = 0;
@@ -1938,6 +1939,53 @@ class Blueprint {
   }
 
   /**
+   * 把一个新分拣器登记到它所属的生产建筑上。熔炉的分拣器达到3个起，
+   * 每多一个都需要扩展熔炉侧边空间，即对同行后续建筑做位移，否则分拣器会重叠。
+   * 输入侧和输出侧共用这段记账。
+   */
+  attachSorterToBuilding(ownerObjIdx, ownerName, sorterIndex) {
+    let startMove = false;
+    let findTargetBuilding = false;
+    for (let i = 0; i < this.buildingArray.length; i++) {
+      for (let k = 0; k < this.buildingArray[i].length; k++) {
+        const cell = this.buildingArray[i][k];
+        if (cell.index === ownerObjIdx) {
+          cell.sorterList.push(sorterIndex);
+          findTargetBuilding = true;
+          if (
+            buildingMap[ownerName].category === productionCategory.smelter &&
+            cell.sorterList.length >= 3
+          ) {
+            startMove = true;
+          } else {
+            break;
+          }
+        } else if (startMove) {
+          // move building and sorters
+          let toMoveNum = 1 + cell.sorterList.length;
+          for (let b of this.buildings) {
+            if (b.index === cell.index) {
+              b.localOffset[0].x += 1;
+              b.localOffset[1].x += 1;
+              toMoveNum--;
+            } else if (cell.sorterList.includes(b.index)) {
+              b.localOffset[0].x += 1;
+              b.localOffset[1].x += 1;
+              toMoveNum--;
+            }
+            if (toMoveNum <= 0) {
+              break;
+            }
+          }
+        }
+      }
+      if (findTargetBuilding) {
+        break;
+      }
+    }
+  }
+
+  /**
    * 分拣器的唯一注册点。按方向决定建筑侧是输入端还是输出端，
    * 并把分拣器登记进 this.sorters[item][direction === 1 ? "input" : "output"]
    * @param {Object} p itemName/direction/rate/slotIndex/sorter/ownerObjIdx/ownerName/ownerOffset/category/recipeID/sorterList
@@ -1968,7 +2016,7 @@ class Blueprint {
     s.localOffset = offsetInfo.offset;
     s.yaw = offsetInfo.yaw;
     this.buildings.push(s);
-    p.sorterList.push(s.index);
+    if (p.sorterList) p.sorterList.push(s.index);
 
     const bucket = p.direction === 1 ? "input" : "output";
     if (!this.sorters[p.itemName]) this.sorters[p.itemName] = {};
@@ -2014,16 +2062,24 @@ class Blueprint {
     const free = this.countFreeSlots(p.alloc);
     const extraCount = Math.min(need - 1, free);
     if (need - 1 > free) {
-      cocoMessage.warning(
-        `${p.ownerName} 的${itemMap[p.itemName].remark}需要 ${need} 个分拣器，` +
-          `但只剩 ${free} 个槽位，已超载运行（产量可能低于预期）`,
-        5000
-      );
+      const key = p.ownerName + "|exhausted";
+      if (!this.slotExhaustedWarned.has(key)) {
+        this.slotExhaustedWarned.add(key);
+        cocoMessage.warning(
+          `${p.ownerName} 的槽位装不下所需分拣器（需要 ${need} 个，只剩 ${free} 个），` +
+            `已超载运行，产量可能低于预期`,
+          5000
+        );
+      }
     } else if (upgraded) {
-      cocoMessage.warning(
-        `${p.ownerName} 分拣器槽位不足，已自动升级为${itemMap[sorter.name].remark}`,
-        4000
-      );
+      const key = p.ownerName + "|" + sorter.name;
+      if (!this.upgradeWarned.has(key)) {
+        this.upgradeWarned.add(key);
+        cocoMessage.warning(
+          `${p.ownerName} 分拣器槽位不足，已自动升级为${itemMap[sorter.name].remark}`,
+          4000
+        );
+      }
     }
 
     const slots = [p.primarySlot];
@@ -2223,18 +2279,14 @@ class Blueprint {
           const outputQueue =
             this.sorters[itemName] && this.sorters[itemName].output;
           if (!outputQueue || outputQueue.length === 0) break;
-          // 传送带与分拣器的上限互相独立，单个分拣器的速率可能高于所选带速。
-          // 此时让这条带单独承载它，否则该分拣器永远装不下 → 同样会死循环
-          const tailSorter = outputQueue[outputQueue.length - 1];
-          if (tailSorter.rate > inputRate) inputRate = tailSorter.rate;
           for (let j = outputQueue.length - 1; j >= 0; j--) {
-            if (this.sorters[itemName].output[j].rate - inputRate > zero) {
-              // if ((j>0)&&(i+1 >= Math.ceil(item.rate/maxTransportSpeed))){
-              //     // 有分拣器还未连接 并且 不会再生成新的传送带了
-              //     // 这种情况就是建筑非整数时计算误差导致的，继续处理未连接的分拣器就可以了
-
-              // 当前带接受运力不能满足分拣器，则该分拣器连接下一个带上的节点
-              break;
+            if (outputQueue[j].rate - inputRate > zero) {
+              // 本条带接受不了这个分拣器，则该分拣器连到下一个带上的节点。
+              // "传送带运力不足"就是这样体现为更多条并行的带的
+              if (doneRate > zero) break;
+              // 本条带连一个分拣器都装不下（单个分拣器的速率就超过带宽）：
+              // 只能让本条带超载承载它，否则 doneRate 永远是 0 → 死循环
+              inputRate = outputQueue[j].rate;
             }
             if (doneSorterNum % this.config.maxSorterNumOneBelt === 0) {
               inputData.push([this.sorters[itemName].output[j].index]);
@@ -2281,10 +2333,9 @@ class Blueprint {
           this.sorters[itemName].input = input2;
         }
         if (item.toBuildingNum !== 0) {
-          // 兜底：没有待连接的分拣器时终止，避免 while 空转
-          const inputQueue =
-            this.sorters[itemName] && this.sorters[itemName].input;
-          if (!inputQueue || inputQueue.length === 0) break;
+          // 注意：这里不能因为 input 队列空了就 break —— doneRate 只由产出侧和
+          // 原料侧累加，输入侧消不消费都不影响循环推进，不会空转；而一旦 break，
+          // 产出侧剩下的分拣器就再也接不上带了
           for (let j = this.sorters[itemName].input.length - 1; j >= 0; j--) {
             const ownerObjIdx = this.sorters[itemName].input[j].ownerObjIdx;
             const needsSplit =
@@ -2344,56 +2395,11 @@ class Blueprint {
               newSorter.yaw = offsetInfo.yaw;
               // console.log(newSorter)
               this.buildings.push(newSorter);
-              // console.log(`add sorter for ${this.sorters[itemName].input[j].ownerObjIdx}`)
-              let startMove = false;
-              let findTargetBuilding = false;
-              for (let i = 0; i < this.buildingArray.length; i++) {
-                for (let k = 0; k < this.buildingArray[i].length; k++) {
-                  if (
-                    this.buildingArray[i][k].index ===
-                    this.sorters[itemName].input[j].ownerObjIdx
-                  ) {
-                    this.buildingArray[i][k].sorterList.push(newSorter.index);
-                    findTargetBuilding = true;
-                    if (
-                      buildingMap[this.sorters[itemName].input[j].ownerName]
-                        .category === productionCategory.smelter &&
-                      this.buildingArray[i][k].sorterList.length >= 3
-                    ) {
-                      // 熔炉的分拣器达到3个起，每多一个都需要扩展熔炉侧边空间，
-                      // 即对后续建筑进行建筑位移。拆分后熔炉可能挂4~6个分拣器，
-                      // 用 >= 而不是 === ，否则会静默跳过位移导致分拣器重叠
-                      startMove = true;
-                    } else {
-                      break;
-                    }
-                  } else if (startMove) {
-                    // move building and sorters
-                    let toMoveNum =
-                      1 + this.buildingArray[i][k].sorterList.length;
-                    for (let b of this.buildings) {
-                      if (b.index === this.buildingArray[i][k].index) {
-                        // console.log(`move ${b.index}`)
-                        b.localOffset[0].x += 1;
-                        b.localOffset[1].x += 1;
-                        toMoveNum--;
-                      } else if (
-                        this.buildingArray[i][k].sorterList.includes(b.index)
-                      ) {
-                        b.localOffset[0].x += 1;
-                        b.localOffset[1].x += 1;
-                        toMoveNum--;
-                      }
-                      if (toMoveNum <= 0) {
-                        break;
-                      }
-                    }
-                  }
-                }
-                if (findTargetBuilding) {
-                  break;
-                }
-              }
+              this.attachSorterToBuilding(
+                newSorter.outputObjIdx,
+                this.sorters[itemName].input[j].ownerName,
+                newSorter.index
+              );
               this.sorters[itemName].input.unshift({
                 index: newSorter.index,
                 rate: newSorterRate,
