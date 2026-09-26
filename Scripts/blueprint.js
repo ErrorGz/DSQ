@@ -339,7 +339,15 @@ const buildingMap = {
     type: buildingType.sorter,
     remark: "分拣器MK.I",
   },
-  // sorterMk2: { remark: '高速分拣器', name: 'sorterMk2', itemId: 2012, modelIndex: 42 },
+  sorterMk2: {
+    name: "sorterMk2",
+    itemId: 2012,
+    modelIndex: 42,
+    sortingSpeed: 3,
+    size: { x: 1, y: 1 },
+    type: buildingType.sorter,
+    remark: "分拣器MK.Ⅱ",
+  },
   sorterMk3: {
     name: "sorterMk3",
     itemId: 2013,
@@ -368,9 +376,17 @@ const buildingMap = {
     type: buildingType.conveyor,
     remark: "传送带MK.I",
   },
-  // conveyorBeltMK2: { remark: '高速传送带', name: 'conveyorBeltMK2', itemId: 2002, modelIndex: 36 },
-  conveyorBeltMK3: {
-    name: "conveyorBeltMK3",
+  conveyorBeltMk2: {
+    name: "conveyorBeltMk2",
+    itemId: 2002,
+    modelIndex: 36,
+    transportSpeed: 12,
+    size: { x: 1, y: 1 },
+    type: buildingType.conveyor,
+    remark: "传送带MK.Ⅱ",
+  },
+  conveyorBeltMk3: {
+    name: "conveyorBeltMk3",
     itemId: 2003,
     modelIndex: 37,
     transportSpeed: 30,
@@ -409,6 +425,15 @@ const buildingMap = {
     remark: "模板",
   },
 };
+// 可选的传送带 / 分拣器档位，从低到高。同时也是 buildingMap 的 key，
+// 与 map / select 的 value 共用同一个字符串（全小写 Mk）
+const beltTierKeys = ["conveyorBeltMk1", "conveyorBeltMk2", "conveyorBeltMk3"];
+const sorterTierKeys = [
+  "sorterMk1",
+  "sorterMk2",
+  "sorterMk3",
+  "sorterMk4",
+];
 
 const recipeMap = {
   "refinedOil+stone+water=sulfuricAcid": 24, // 硫酸
@@ -592,15 +617,25 @@ class Blueprint {
     //     conveyorBeltStackLayer: 4,  // 传送带物品最大堆叠层数
     //     x_y_ratio: 2,  // 长宽比
     //     compactLayout: false,  // 是否采用紧凑布局（紧凑布局的蓝图中炼油厂、化工厂和对撞机在布局上会更紧凑，适合摆放在赤道带，在高纬度可能会出现碰撞问题）
-    //     upgradeConveyorBelt: false,  // 360/min的运力时使用3级传送带（无带流情况下，原料的需求和供应都是集中处理，1级传送带满运力情况下可能会有运送不及时问题导致产量低于预期
-    //     onlyConveyorBeltMk3: false,  // 是否只使用三级传送带
-    //     onlySorterMk3: false,  // 是否只使用三级分拣器
+    //     beltKey: "conveyorBeltMk3",  // 指定传送带(buildingMap key)：决定运力上限与实际放置的传送带
+    //     sorterKey: "sorterMk1",  // 指定分拣器(buildingMap key)：决定单分拣器承载上限与实际放置的分拣器
     //     maxLabLayers: 15,  // 研究站最大层数
     //     selfSpray: true,  // 增产剂是否自喷涂
     // }
     this.config = config;
+    // 归一化档位 key，避免 DOM 取值异常时 buildingMap[key] 为 undefined
+    this.config.beltKey = beltTierKeys.includes(config.beltKey)
+      ? config.beltKey
+      : "conveyorBeltMk3";
+    this.config.sorterKey = sorterTierKeys.includes(config.sorterKey)
+      ? config.sorterKey
+      : "sorterMk1";
     this.buildingArray = [];
     this.sorters = {};
+    // 每个生产建筑的槽位分配器状态，供 generateConveyorBelts 追加分拣器时复用
+    this.buildingAlloc = {};
+    // 槽位耗尽的建筑，避免重复告警
+    this.slotExhaustedWarned = new Set();
     this.sprayCoaterOffsetList = [];
     this.itemSummary = {};
     this.conveyorStartOffsetX = 0;
@@ -1716,14 +1751,12 @@ class Blueprint {
       }
 
       // 添加分拣器
-      let slotIndex = buildingMap[subRecipe.building.name].slotMaxIndex;
-      let productionSpeed =
+      const productionSpeed =
         buildingMap[subRecipe.building.name].productionSpeed;
+      const category = buildingMap[subRecipe.building.name].category;
       let sorterList = [];
       let actual_building_num = Math.min(1, subRecipe.building.num - i); // 建筑不是整数的时候，最后一个建筑分拣器实际rate会更低
-      if (
-        buildingMap[subRecipe.building.name].category === productionCategory.lab
-      ) {
+      if (category === productionCategory.lab) {
         actual_building_num += stackLabBuildingIndexList.length;
       }
 
@@ -1736,289 +1769,71 @@ class Blueprint {
         }
       }
 
+      // 汇总该建筑要挂分拣器的全部物品。先后顺序与旧的 slotIndex 递减顺序一致：
+      // 先产物（direction 0，从建筑出货），再原料（direction 1，从带进货）
+      const sorterItems = [];
       for (let outputItem of subRecipe.output) {
-        let actual_rate =
-          outputItem.rate * productionSpeed * actual_building_num * extra_rate;
-        let sorter = buildingMap.sorterMk1;
-        if (this.config.onlySorterMk3 || actual_rate > sorter.sortingSpeed) {
-          // 一级分拣器不够用时直接使用三级分拣器，二级分拣器没太大价值，直接略过
-          sorter = buildingMap.sorterMk3;
-        }
-        if (buildingMap[subRecipe.building.name].category === productionCategory.lab &&
-          actual_rate > buildingMap.sorterMk3.sortingSpeed
-        ) {
-          // 研究站层数过高时会出现一个3级分拣器无法满足运力的问题
-          let newSorter2 = this.getBuildingTemplate();
-          newSorter2.itemId = sorter.itemId;
-          newSorter2.modelIndex = sorter.modelIndex;
-          newSorter2.inputObjIdx = nowBuildingIndex;
-          newSorter2.outputToSlot = -1;
-          newSorter2.inputToSlot = 1;
-          newSorter2.inputFromSlot = slotIndex - 3;
-          newSorter2.filterId = itemMap[outputItem.name].iconId;
-          newSorter2.parameters = { length: 1 };
-          const offsetInfo2 = this.calculateSorterLocalOffsetAndYaw(
-            { x: buildingX, y: buildingY, z: buildingZ },
-            buildingMap[subRecipe.building.name].category,
-            slotIndex - 3
-          );
-          newSorter2.localOffset = offsetInfo2.offset;
-          newSorter2.yaw = offsetInfo2.yaw;
-          this.buildings.push(newSorter2);
-          sorterList.push(this.buildingIndex);
-          if (this.sorters[outputItem.name]) {
-            // 已存在就append
-            if (this.sorters[outputItem.name].output) {
-              this.sorters[outputItem.name].output.push({
-                index: newSorter2.index,
-                rate: buildingMap.sorterMk3.sortingSpeed,
-                ownerObjIdx: nowBuildingIndex, // 分拣器附属生产建筑的index
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              });
-            } else {
-              this.sorters[outputItem.name].output = [
-                {
-                  index: newSorter2.index,
-                  rate: buildingMap.sorterMk3.sortingSpeed,
-                  ownerObjIdx: nowBuildingIndex,
-                  ownerName: subRecipe.building.name,
-                  ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                  recipeID: parseInt(subRecipe.recipeID),
-                },
-              ];
-            }
-          } else {
-            // 不存在就新建
-            this.sorters[outputItem.name] = {
-              output: [
-                {
-                  index: newSorter2.index,
-                  rate: buildingMap.sorterMk3.sortingSpeed,
-                  ownerObjIdx: nowBuildingIndex,
-                  ownerName: subRecipe.building.name,
-                  ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                  recipeID: parseInt(subRecipe.recipeID),
-                },
-              ],
-            };
-          }
-          actual_rate -= buildingMap.sorterMk3.sortingSpeed;
-        }
-        let newSorter = this.getBuildingTemplate();
-        newSorter.itemId = sorter.itemId;
-        newSorter.modelIndex = sorter.modelIndex;
-        newSorter.inputObjIdx = nowBuildingIndex;
-        newSorter.outputToSlot = -1;
-        newSorter.inputToSlot = 1;
-        newSorter.inputFromSlot = slotIndex;
-        newSorter.filterId = itemMap[outputItem.name].iconId;
-        newSorter.parameters = { length: 1 };
-        const offsetInfo = this.calculateSorterLocalOffsetAndYaw(
-          { x: buildingX, y: buildingY, z: buildingZ },
-          buildingMap[subRecipe.building.name].category,
-          slotIndex
-        );
-        newSorter.localOffset = offsetInfo.offset;
-        newSorter.yaw = offsetInfo.yaw;
-        this.buildings.push(newSorter);
-        sorterList.push(this.buildingIndex);
-        // this.buildingArray[this.buildingArray.length-1].push({index: this.buildingIndex, type: buildingType.sorter})
-        if (this.sorters[outputItem.name]) {
-          // 已存在就append
-          if (this.sorters[outputItem.name].output) {
-            this.sorters[outputItem.name].output.push({
-              index: newSorter.index,
-              rate: actual_rate,
-              ownerObjIdx: nowBuildingIndex, // 分拣器附属生产建筑的index
-              ownerName: subRecipe.building.name,
-              ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-              recipeID: parseInt(subRecipe.recipeID),
-            });
-          } else {
-            this.sorters[outputItem.name].output = [
-              {
-                index: newSorter.index,
-                rate: actual_rate,
-                ownerObjIdx: nowBuildingIndex,
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              },
-            ];
-          }
-        } else {
-          // 不存在就新建
-          this.sorters[outputItem.name] = {
-            output: [
-              {
-                index: newSorter.index,
-                rate: actual_rate,
-                ownerObjIdx: nowBuildingIndex,
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              },
-            ],
-          };
-        }
-        slotIndex--;
-        if (!this.config.compactLayout) {
-          // 非紧凑布局，调整对撞机的分拣器连接点
-          if (
-            buildingMap[subRecipe.building.name].category ===
-              productionCategory.collider &&
-            slotIndex === 5
-          ) {
-            slotIndex = 2;
-          }
-        }
+        sorterItems.push({
+          itemName: outputItem.name,
+          direction: 0,
+          rate:
+            outputItem.rate *
+            productionSpeed *
+            actual_building_num *
+            extra_rate,
+        });
       }
       for (let inputItem of subRecipe.input) {
-        let actual_rate =
-          inputItem.rate * productionSpeed * actual_building_num;
+        let rate = inputItem.rate * productionSpeed * actual_building_num;
         if (subRecipe.acceleratorMode === 1) {
           // 加速时原料也要加速；增产时则不需要
-          actual_rate *= extra_rate;
+          rate *= extra_rate;
         }
-        let sorter = buildingMap.sorterMk1;
-        if (this.config.onlySorterMk3 || actual_rate > sorter.sortingSpeed) {
-          // 一级分拣器不够用时直接使用三级分拣器
-          sorter = buildingMap.sorterMk3;
-        }
+        sorterItems.push({
+          itemName: inputItem.name,
+          direction: 1,
+          rate: rate,
+        });
+      }
 
-        if (buildingMap[subRecipe.building.name].category === productionCategory.lab &&
-          actual_rate > buildingMap.sorterMk3.sortingSpeed
-        ) {
-          // 研究站层数过高时会出现一个3级分拣器无法满足运力的问题
-          let newSorter2 = this.getBuildingTemplate();
-          newSorter2.itemId = sorter.itemId;
-          newSorter2.modelIndex = sorter.modelIndex;
-          newSorter2.inputObjIdx = nowBuildingIndex;
-          newSorter2.outputToSlot = slotIndex - 3;
-          newSorter2.inputToSlot = 1;
-          newSorter2.filterId = itemMap[inputItem.name].iconId;
-          newSorter2.parameters = { length: 1 };
-          const offsetInfo2 = this.calculateSorterLocalOffsetAndYaw(
-            { x: buildingX, y: buildingY, z: buildingZ },
-            buildingMap[subRecipe.building.name].category,
-            slotIndex - 3,
-            1
-          );
-          newSorter2.localOffset = offsetInfo2.offset;
-          newSorter2.yaw = offsetInfo2.yaw;
-          this.buildings.push(newSorter2);
-          sorterList.push(this.buildingIndex);
-          if (this.sorters[inputItem.name]) {
-            // 已存在就append
-            if (this.sorters[inputItem.name].output) {
-              this.sorters[inputItem.name].output.push({
-                index: newSorter2.index,
-                rate: buildingMap.sorterMk3.sortingSpeed,
-                ownerObjIdx: nowBuildingIndex, // 分拣器附属生产建筑的index
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              });
-            } else {
-              this.sorters[inputItem.name].output = [
-                {
-                  index: newSorter2.index,
-                  rate: buildingMap.sorterMk3.sortingSpeed,
-                  ownerObjIdx: nowBuildingIndex,
-                  ownerName: subRecipe.building.name,
-                  ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                  recipeID: parseInt(subRecipe.recipeID),
-                },
-              ];
-            }
-          } else {
-            // 不存在就新建
-            this.sorters[inputItem.name] = {
-              output: [
-                {
-                  index: newSorter2.index,
-                  rate: buildingMap.sorterMk3.sortingSpeed,
-                  ownerObjIdx: nowBuildingIndex,
-                  ownerName: subRecipe.building.name,
-                  ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                  recipeID: parseInt(subRecipe.recipeID),
-                },
-              ],
-            };
-          }
-          actual_rate -= buildingMap.sorterMk3.sortingSpeed;
-        }
-
-        let newSorter = this.getBuildingTemplate();
-        newSorter.itemId = sorter.itemId;
-        newSorter.modelIndex = sorter.modelIndex;
-        newSorter.outputObjIdx = nowBuildingIndex;
-        newSorter.outputToSlot = slotIndex;
-        newSorter.inputToSlot = 1;
-        newSorter.filterId = itemMap[inputItem.name].iconId;
-        newSorter.parameters = { length: 1 };
-        const offsetInfo = this.calculateSorterLocalOffsetAndYaw(
-          { x: buildingX, y: buildingY, z: buildingZ },
-          buildingMap[subRecipe.building.name].category,
-          slotIndex,
-          1
+      const alloc = this.newSlotAllocator(
+        category,
+        buildingMap[subRecipe.building.name].slotMaxIndex
+      );
+      this.buildingAlloc[nowBuildingIndex] = alloc;
+      // 先给每种物品各预留一个主槽位，保证每种物品至少有一个分拣器
+      // （generateConveyorBelts 对 this.sorters[name].output/.input 是无保护解引用的）
+      const primarySlots = [];
+      for (let k = 0; k < sorterItems.length; k++) {
+        primarySlots.push(this.takeSlot(alloc));
+      }
+      if (primarySlots.indexOf(null) !== -1) {
+        const totalSlots = this.countFreeSlots(
+          this.newSlotAllocator(
+            category,
+            buildingMap[subRecipe.building.name].slotMaxIndex
+          )
         );
-        newSorter.localOffset = offsetInfo.offset;
-        newSorter.yaw = offsetInfo.yaw;
-        this.buildings.push(newSorter);
-        sorterList.push(this.buildingIndex);
-        // this.buildingArray[this.buildingArray.length-1].push({index: this.buildingIndex, type: buildingType.sorter})
-        if (this.sorters[inputItem.name]) {
-          // 已存在就append
-          if (this.sorters[inputItem.name].input) {
-            this.sorters[inputItem.name].input.push({
-              index: newSorter.index,
-              rate: actual_rate,
-              ownerObjIdx: nowBuildingIndex, // 分拣器附属生产建筑的index
-              ownerName: subRecipe.building.name,
-              ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-              recipeID: parseInt(subRecipe.recipeID),
-            });
-          } else {
-            this.sorters[inputItem.name].input = [
-              {
-                index: newSorter.index,
-                rate: actual_rate,
-                ownerObjIdx: nowBuildingIndex,
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              },
-            ];
-          }
-        } else {
-          // 不存在就新建
-          this.sorters[inputItem.name] = {
-            input: [
-              {
-                index: newSorter.index,
-                rate: actual_rate,
-                ownerObjIdx: nowBuildingIndex,
-                ownerName: subRecipe.building.name,
-                ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
-                recipeID: parseInt(subRecipe.recipeID),
-              },
-            ],
-          };
-        }
-        slotIndex--;
-        if (!this.config.compactLayout) {
-          // 非紧凑布局，调整对撞机的分拣器连接点
-          if (
-            buildingMap[subRecipe.building.name].category ===
-              productionCategory.collider &&
-            slotIndex === 5
-          ) {
-            slotIndex = 2;
-          }
-        }
+        cocoMessage.error(
+          `${subRecipe.building.name} 只有 ${totalSlots} 个分拣器槽位，` +
+            `放不下 ${sorterItems.length} 种物品的分拣器`,
+          5000
+        );
+        throw `sorter slot exhausted for ${subRecipe.building.name}`;
+      }
+      for (let k = 0; k < sorterItems.length; k++) {
+        this.createSortersForItem(
+          Object.assign({}, sorterItems[k], {
+            primarySlot: primarySlots[k],
+            alloc: alloc,
+            ownerObjIdx: nowBuildingIndex,
+            ownerName: subRecipe.building.name,
+            ownerOffset: { x: buildingX, y: buildingY, z: buildingZ },
+            category: category,
+            recipeID: parseInt(subRecipe.recipeID),
+            sorterList: sorterList,
+          })
+        );
       }
 
       if (needNewLine) {
@@ -2046,13 +1861,187 @@ class Blueprint {
   init() {
     this.mapRecipeID();
     this.calculateBlueprintArea();
-    if (this.config.onlyConveyorBeltMk3Downgrade) {
-      buildingMap.conveyorBeltMK3.transportSpeed = 28;
-    } else {
-      buildingMap.conveyorBeltMK3.transportSpeed = 30;
-    }
     // console.log(buildingMap)
     // this.blueprintTemplate.areas[0].size = this.blueprintSize
+  }
+
+  /** 用户指定的传送带建筑（运力上限与实际放置的传送带都由它决定） */
+  getBelt() {
+    return buildingMap[this.config.beltKey];
+  }
+
+  /** 用户指定的分拣器建筑（承载上限与实际放置的分拣器都由它决定） */
+  getSorter() {
+    return buildingMap[this.config.sorterKey];
+  }
+
+  /**
+   * 新建一个建筑槽位分配器。槽位号从 slotMaxIndex 递减，
+   * 取值域必须与 calculateSorterLocalOffsetAndYaw 的 switch 一致（越界会 throw）
+   */
+  newSlotAllocator(category, slotMaxIndex) {
+    const lowerBound =
+      category === productionCategory.smelter ||
+      category === productionCategory.assembling ||
+      category === productionCategory.lab
+        ? 3
+        : 0;
+    return {
+      category: category,
+      slotIndex: slotMaxIndex,
+      lowerBound: lowerBound,
+      used: new Set(),
+    };
+  }
+
+  /** 取一个可用槽位，耗尽返回 null */
+  takeSlot(alloc) {
+    // 跳过已被占用的槽位（对撞机跳格会留下空洞）
+    while (
+      alloc.slotIndex >= alloc.lowerBound &&
+      alloc.used.has(alloc.slotIndex)
+    ) {
+      alloc.slotIndex--;
+    }
+    if (alloc.slotIndex < alloc.lowerBound) return null;
+    const slot = alloc.slotIndex;
+    alloc.used.add(slot);
+    alloc.slotIndex--;
+    if (
+      !this.config.compactLayout &&
+      alloc.category === productionCategory.collider &&
+      alloc.slotIndex === 5
+    ) {
+      // 非紧凑布局，调整对撞机的分拣器连接点
+      alloc.slotIndex = 2;
+    }
+    return slot;
+  }
+
+  /** 剩余可用槽位数（不改变传入的 alloc） */
+  countFreeSlots(alloc) {
+    const probe = {
+      category: alloc.category,
+      slotIndex: alloc.slotIndex,
+      lowerBound: alloc.lowerBound,
+      used: new Set(alloc.used),
+    };
+    let n = 0;
+    while (this.takeSlot(probe) !== null) n++;
+    return n;
+  }
+
+  /** 该生产建筑是否还有空槽位可以再挂一个分拣器 */
+  hasFreeSlot(buildingIndex) {
+    const alloc = this.buildingAlloc[buildingIndex];
+    return alloc ? this.countFreeSlots(alloc) > 0 : false;
+  }
+
+  /**
+   * 分拣器的唯一注册点。按方向决定建筑侧是输入端还是输出端，
+   * 并把分拣器登记进 this.sorters[item][direction === 1 ? "input" : "output"]
+   * @param {Object} p itemName/direction/rate/slotIndex/sorter/ownerObjIdx/ownerName/ownerOffset/category/recipeID/sorterList
+   */
+  pushSorter(p) {
+    const s = this.getBuildingTemplate();
+    s.itemId = p.sorter.itemId;
+    s.modelIndex = p.sorter.modelIndex;
+    if (p.direction === 1) {
+      // 进货：建筑侧是输出端
+      s.outputObjIdx = p.ownerObjIdx;
+      s.outputToSlot = p.slotIndex;
+    } else {
+      // 产出：建筑侧是输入端
+      s.inputObjIdx = p.ownerObjIdx;
+      s.inputFromSlot = p.slotIndex;
+      s.outputToSlot = -1; // -1 表示稍后由 newConveyor 改写成传送带节点
+    }
+    s.inputToSlot = 1;
+    s.filterId = itemMap[p.itemName].iconId;
+    s.parameters = { length: 1 };
+    const offsetInfo = this.calculateSorterLocalOffsetAndYaw(
+      p.ownerOffset,
+      p.category,
+      p.slotIndex,
+      p.direction
+    );
+    s.localOffset = offsetInfo.offset;
+    s.yaw = offsetInfo.yaw;
+    this.buildings.push(s);
+    p.sorterList.push(s.index);
+
+    const bucket = p.direction === 1 ? "input" : "output";
+    if (!this.sorters[p.itemName]) this.sorters[p.itemName] = {};
+    if (!this.sorters[p.itemName][bucket]) this.sorters[p.itemName][bucket] = [];
+    this.sorters[p.itemName][bucket].push({
+      index: s.index,
+      rate: p.rate,
+      ownerObjIdx: p.ownerObjIdx,
+      ownerName: p.ownerName,
+      ownerOffset: {
+        x: p.ownerOffset.x,
+        y: p.ownerOffset.y,
+        z: p.ownerOffset.z,
+      },
+      recipeID: p.recipeID,
+    });
+    return s;
+  }
+
+  /**
+   * 为一个物品创建 1..N 个分拣器：把 p.rate 摊到每个不超过所选分拣器
+   * sortingSpeed 的分拣器上。槽位不够时自动升档（档位越高所需数量越少），
+   * 升到最高档仍不够则把剩余速率压到最后一个分拣器上并告警。
+   * 先推大块、最后推余数——generateConveyorBelts 取 output 队尾优先装带，
+   * 这样每条新带拿到的是最小的一块。
+   */
+  createSortersForItem(p) {
+    let sorter = this.getSorter();
+    let ceiling = sorter.sortingSpeed;
+    let need = Math.max(1, Math.ceil((p.rate - 1e-10) / ceiling));
+    let upgraded = false;
+    for (
+      let i = sorterTierKeys.indexOf(this.config.sorterKey) + 1;
+      i < sorterTierKeys.length && need - 1 > this.countFreeSlots(p.alloc);
+      i++
+    ) {
+      sorter = buildingMap[sorterTierKeys[i]];
+      ceiling = sorter.sortingSpeed;
+      need = Math.max(1, Math.ceil((p.rate - 1e-10) / ceiling));
+      upgraded = true;
+    }
+
+    const free = this.countFreeSlots(p.alloc);
+    const extraCount = Math.min(need - 1, free);
+    if (need - 1 > free) {
+      cocoMessage.warning(
+        `${p.ownerName} 的${itemMap[p.itemName].remark}需要 ${need} 个分拣器，` +
+          `但只剩 ${free} 个槽位，已超载运行（产量可能低于预期）`,
+        5000
+      );
+    } else if (upgraded) {
+      cocoMessage.warning(
+        `${p.ownerName} 分拣器槽位不足，已自动升级为${itemMap[sorter.name].remark}`,
+        4000
+      );
+    }
+
+    const slots = [p.primarySlot];
+    for (let k = 0; k < extraCount; k++) slots.push(this.takeSlot(p.alloc));
+
+    let remaining = p.rate;
+    for (let k = 0; k < slots.length; k++) {
+      const rate =
+        k === slots.length - 1 ? remaining : Math.min(remaining, ceiling);
+      remaining -= rate;
+      this.pushSorter(
+        Object.assign({}, p, {
+          sorter: sorter,
+          rate: rate,
+          slotIndex: slots[k],
+        })
+      );
+    }
   }
 
   sortItemSummary(itemSummary) {
@@ -2211,26 +2200,13 @@ class Blueprint {
       // console.log(itemName)
       item = itemSummary[item];
 
-      let conveyorBelt = buildingMap.conveyorBeltMk1;
-      if (this.config.onlyConveyorBeltMk3) {
-        conveyorBelt = buildingMap.conveyorBeltMK3;
-      } else if (item.rate >= conveyorBelt.transportSpeed) {
-        if (
-          item.rate === conveyorBelt.transportSpeed &&
-          this.config.upgradeConveyorBelt
-        ) {
-          conveyorBelt = buildingMap.conveyorBeltMK3; // 直接使用三级传送带，跳过二级
-        } else if (item.rate > conveyorBelt.transportSpeed) {
-          conveyorBelt = buildingMap.conveyorBeltMK3;
-        }
-      }
-
-      let maxTransportSpeed = buildingMap.conveyorBeltMK3.transportSpeed;
+      // 只使用用户指定的传送带：它同时决定运力上限和实际放置的传送带建筑
+      const conveyorBelt = this.getBelt();
+      let maxTransportSpeed = conveyorBelt.transportSpeed;
       if (item.fromBuildingNum === 0) {
         // 只有原料可以堆叠，中间产物不支持堆叠
         maxTransportSpeed =
-          buildingMap.conveyorBeltMK3.transportSpeed *
-          this.config.conveyorBeltStackLayer;
+          conveyorBelt.transportSpeed * this.config.conveyorBeltStackLayer;
       }
 
       for (let totalDoneRate = 0; item.rate - totalDoneRate > zero; ) {
@@ -2242,7 +2218,16 @@ class Blueprint {
         let outputData = [];
         let doneSorterNum = 0;
         if (item.fromBuildingNum !== 0) {
-          for (let j = this.sorters[itemName].output.length - 1; j >= 0; j--) {
+          // 兜底：没有可连接的分拣器时终止该物品。否则本轮的 doneRate 为 0、
+          // totalDoneRate 不前进，while 会以完全相同的状态无限重复，卡死浏览器
+          const outputQueue =
+            this.sorters[itemName] && this.sorters[itemName].output;
+          if (!outputQueue || outputQueue.length === 0) break;
+          // 传送带与分拣器的上限互相独立，单个分拣器的速率可能高于所选带速。
+          // 此时让这条带单独承载它，否则该分拣器永远装不下 → 同样会死循环
+          const tailSorter = outputQueue[outputQueue.length - 1];
+          if (tailSorter.rate > inputRate) inputRate = tailSorter.rate;
+          for (let j = outputQueue.length - 1; j >= 0; j--) {
             if (this.sorters[itemName].output[j].rate - inputRate > zero) {
               // if ((j>0)&&(i+1 >= Math.ceil(item.rate/maxTransportSpeed))){
               //     // 有分拣器还未连接 并且 不会再生成新的传送带了
@@ -2296,53 +2281,62 @@ class Blueprint {
           this.sorters[itemName].input = input2;
         }
         if (item.toBuildingNum !== 0) {
+          // 兜底：没有待连接的分拣器时终止，避免 while 空转
+          const inputQueue =
+            this.sorters[itemName] && this.sorters[itemName].input;
+          if (!inputQueue || inputQueue.length === 0) break;
           for (let j = this.sorters[itemName].input.length - 1; j >= 0; j--) {
-            if (
+            const ownerObjIdx = this.sorters[itemName].input[j].ownerObjIdx;
+            const needsSplit =
               totalDoneRate + zero < item.rate &&
-              outputRate + zero < this.sorters[itemName].input[j].rate
+              outputRate + zero < this.sorters[itemName].input[j].rate;
+            // 槽位不够就不拆：本带直接承载整个分拣器（超载运行）。
+            // 否则会退回固定槽位，与已占用该槽位的分拣器重叠
+            const ownerHasSlot = this.hasFreeSlot(ownerObjIdx);
+            if (
+              needsSplit &&
+              !ownerHasSlot &&
+              !this.slotExhaustedWarned.has(ownerObjIdx)
             ) {
+              this.slotExhaustedWarned.add(ownerObjIdx);
+              cocoMessage.error(
+                `${this.sorters[itemName].input[j].ownerName} 的分拣器槽位已用尽，` +
+                  `无法再拆分拣器，该处传送带将超载运行、产量低于预期。` +
+                  `请提高「指定传送带」或「指定分拣器」档位`,
+                8000
+              );
+            }
+            if (needsSplit && ownerHasSlot) {
               // 当前带输出运力不能满足分拣器且还会生成新的传送带，则传送带新增一个节点单独该分拣器连接上，同时给对应建筑增加一个分拣器连到下一个节点
               // console.log(`${itemName}: need add sorter`)
               outputData.push([this.sorters[itemName].input[j].index]);
               const newSorterRate =
                 this.sorters[itemName].input[j].rate - outputRate;
-              let sorter = buildingMap.sorterMk1;
-              if (this.config.onlySorterMk3 || newSorterRate > sorter.sortingSpeed) {
-                // 一级分拣器不够用时直接使用三级分拣器，先不支持二级分拣器
-                sorter = buildingMap.sorterMk3;
-              }
+              // 档位由用户指定。newSorterRate 是扣掉本条带能承载的部分之后的余量，
+              // 必然不超过原分拣器的速率，所以一个同档分拣器一定装得下
+              const sorter = this.getSorter();
               let newSorter = this.getBuildingTemplate();
               // console.log(`new sorter: ${newSorter.index}`)
               newSorter.itemId = sorter.itemId;
               newSorter.modelIndex = sorter.modelIndex;
               newSorter.outputObjIdx =
                 this.sorters[itemName].input[j].ownerObjIdx;
-              if (
-                [
-                  productionCategory.assembling,
-                  productionCategory.smelter,
-                  productionCategory.lab,
-                ].includes(
-                  buildingMap[this.sorters[itemName].input[j].ownerName]
-                    .category
-                )
-              ) {
-                // 熔炉、制造台和研究站追加到3号槽位
-                newSorter.outputToSlot = 3;
-              } else if (
-                buildingMap[this.sorters[itemName].input[j].ownerName]
-                  .category === productionCategory.collider
-              ) {
-                newSorter.outputToSlot = 2;
-              } else {
-                // 其他追加到0号槽位
-                newSorter.outputToSlot = 0;
-              }
+              const ownerCategory =
+                buildingMap[this.sorters[itemName].input[j].ownerName].category;
+              // 进入本分支前已用 hasFreeSlot 确认有空槽位，这里必然取得到
+              const ownerAlloc = this.buildingAlloc[newSorter.outputObjIdx];
+              const extraSlot = ownerAlloc ? this.takeSlot(ownerAlloc) : null;
+              newSorter.outputToSlot =
+                extraSlot !== null
+                  ? extraSlot
+                  : ownerAlloc
+                  ? ownerAlloc.lowerBound
+                  : 0;
               newSorter.inputToSlot = 1;
               newSorter.parameters = { length: 1 };
               const offsetInfo = this.calculateSorterLocalOffsetAndYaw(
                 this.sorters[itemName].input[j].ownerOffset,
-                buildingMap[this.sorters[itemName].input[j].ownerName].category,
+                ownerCategory,
                 newSorter.outputToSlot,
                 1
               );
@@ -2364,9 +2358,11 @@ class Blueprint {
                     if (
                       buildingMap[this.sorters[itemName].input[j].ownerName]
                         .category === productionCategory.smelter &&
-                      this.buildingArray[i][k].sorterList.length === 3
+                      this.buildingArray[i][k].sorterList.length >= 3
                     ) {
-                      // 熔炉加入新分拣器后分拣器总数为3，则之前分拣器总数为2，需要扩展熔炉侧边空间，即对后续建筑进行建筑位移
+                      // 熔炉的分拣器达到3个起，每多一个都需要扩展熔炉侧边空间，
+                      // 即对后续建筑进行建筑位移。拆分后熔炉可能挂4~6个分拣器，
+                      // 用 >= 而不是 === ，否则会静默跳过位移导致分拣器重叠
                       startMove = true;
                     } else {
                       break;
@@ -2470,16 +2466,16 @@ class Blueprint {
     if (this.sprayCoaterOffsetList.length === 0) {
       return;
     }
-    let conveyor = buildingMap.conveyorBeltMk1;
-    if (this.config.onlyConveyorBeltMk3) {
-      conveyor = buildingMap.conveyorBeltMK3;
-    } else if (
-      this.itemSummary[this.recipe.proliferator] &&
-      this.itemSummary[this.recipe.proliferator].rate > conveyor.transportSpeed
-    ) {
-      conveyor = buildingMap.conveyorBeltMK3;
-    } else if (!this.itemSummary[this.recipe.proliferator]) {
-      conveyor = buildingMap.conveyorBeltMK3;
+    // 喷涂剂走线是固定几何、无法并联，所以这里只保证"带得起"：
+    // 从用户指定的档位起往上找第一条够用的；都不够就用最高档（与原逻辑一致）
+    let conveyor = this.getBelt();
+    const proliferatorRate = this.itemSummary[this.recipe.proliferator]
+      ? this.itemSummary[this.recipe.proliferator].rate
+      : Infinity;
+    for (const key of beltTierKeys) {
+      if (buildingMap[key].transportSpeed < conveyor.transportSpeed) continue;
+      conveyor = buildingMap[key];
+      if (conveyor.transportSpeed >= proliferatorRate) break;
     }
     let firstSprayOffset = this.sprayCoaterOffsetList[0];
     for (let spray of this.sprayCoaterOffsetList) {
@@ -3711,6 +3707,7 @@ class Blueprint {
       [2011, inserterParamParser],
       [2012, inserterParamParser],
       [2013, inserterParamParser],
+      [2014, inserterParamParser],
       [2101, storageParamParser],
       [2102, storageParamParser],
       [2106, tankParamParser],

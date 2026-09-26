@@ -4579,6 +4579,14 @@ function getAccSpeed(type, value) {
   type_index = type_index >= 0 ? type_index : 0;
   return value == "增产" ? accSpeed.inc[type_index] : accSpeed.acc[type_index];
 }
+// 当前「指定传送带」的每分钟运力。直接读 blueprint.js 的 buildingMap，
+// 与蓝图生成共用同一份数据，避免再维护一张会走样的映射表
+function getSelectedBeltSpeedPerMinute() {
+  var belt =
+    typeof buildingMap !== "undefined" && buildingMap[$("#csd").val()];
+  return belt && belt.transportSpeed ? belt.transportSpeed * 60 : 1800;
+}
+
 function getPfTitle(item, info) {
   var title = [];
   var speed1_5 = parseFloat($("#speed1_5").val());
@@ -4595,13 +4603,7 @@ function getPfTitle(item, info) {
     title.push(getIconShow(item.q[j].name, item.q[j].n || 1));
 
     if (info && $("#showMaxOneBelt").get(0).checked) {
-      var csd = $("#csd").val();
-      var csdsize = 1800;
-      if (csd == "传送带") {
-        csdsize = 360;
-      } else if (csd == "高速传送带") {
-        csdsize = 720;
-      }
+      var csdsize = getSelectedBeltSpeedPerMinute();
       var number =
           info.accValue === "增产"
               ? calculateBaseNumber(item.t, item.q, j, info, csdsize, speed1_5)
@@ -4622,13 +4624,7 @@ function getPfTitle(item, info) {
     title.push(getIconShow(item.s[j].name, item.s[j].n || 1));
 
     if (info && $("#showMaxOneBelt").get(0).checked) {
-      var csd = $("#csd").val();
-      var csdsize = 1800;
-      if (csd == "传送带") {
-        csdsize = 360;
-      } else if (csd == "高速传送带") {
-        csdsize = 720;
-      }
+      var csdsize = getSelectedBeltSpeedPerMinute();
       var number =
           calculateBaseNumber(item.t, item.s, j, info, csdsize, speed1_5) /
           getAccSpeed(info.accType, info.accValue);
@@ -6524,9 +6520,8 @@ function generateBlueprint() {
     x_y_ratio: parseFloat(document.getElementById("x_y_ratio").value), // 长宽比
     // compactLayout: document.getElementById('compactLayout').checked,  // 是否采用紧凑布局（紧凑布局的蓝图中炼油厂、化工厂和对撞机在布局上会更紧凑，适合摆放在赤道带，在高纬度可能会出现碰撞问题）
     compactLayout: false,
-    upgradeConveyorBelt: false, // 360/min的运力时使用3级传送带（无带流情况下，原料的需求和供应都是集中处理，1级传送带满运力情况下可能会有运送不及时问题导致产量低于预期
-    onlyConveyorBeltMk3: document.getElementById("onlyConveyorBeltMk3").checked, // 是否只使用三级传送带
-    onlySorterMk3: document.getElementById("onlySorterMk3").checked, // 是否只使用三级传送带
+    beltKey: document.getElementById("csd").value, // 指定传送带：决定运力上限与实际放置的传送带
+    sorterKey: document.getElementById("sorterCsd").value, // 指定分拣器：决定单分拣器承载上限与实际放置的分拣器
     maxLabLayers: parseInt(document.getElementById("maxLabLayers").value),
     selfSpray: document.getElementById("selfAcc").checked, // 是否自喷涂增产剂
     generateTeslaTower: document.getElementById("generateTeslaTower").checked, // 是否自动插电线杆
@@ -6534,8 +6529,6 @@ function generateBlueprint() {
     teslaTowerLineInterval: parseInt(
       document.getElementById("teslaTowerLineInterval").value
     ), // 电线杆间隔几排
-    // onlyConveyorBeltMk3Downgrade: document.getElementById('onlyConveyorBeltMk3Downgrade').checked  // 三级传送带运力降级
-    onlyConveyorBeltMk3Downgrade: false, // 三级传送带运力降级
   };
   // console.log(config)
   let b1 = new Blueprint(
