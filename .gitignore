@@ -1,0 +1,2 @@
+# 本地自签名的 https 证书与私钥，不要提交
+server/certs/

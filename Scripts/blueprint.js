@@ -2466,17 +2466,10 @@ class Blueprint {
     if (this.sprayCoaterOffsetList.length === 0) {
       return;
     }
-    // 喷涂剂走线是固定几何、无法并联，所以这里只保证"带得起"：
-    // 从用户指定的档位起往上找第一条够用的；都不够就用最高档（与原逻辑一致）
-    let conveyor = this.getBelt();
-    const proliferatorRate = this.itemSummary[this.recipe.proliferator]
-      ? this.itemSummary[this.recipe.proliferator].rate
-      : Infinity;
-    for (const key of beltTierKeys) {
-      if (buildingMap[key].transportSpeed < conveyor.transportSpeed) continue;
-      conveyor = buildingMap[key];
-      if (conveyor.transportSpeed >= proliferatorRate) break;
-    }
+    // 喷涂剂走线同样使用「指定传送带」。这条走线是固定几何、无法并联，
+    // 但它只负责把喷涂剂送到喷涂机，不参与任何运力计算（newConveyorNode
+    // 只取 itemId/modelIndex，parameters 里只有 iconId），所以档位完全跟随用户选择
+    const conveyor = this.getBelt();
     let firstSprayOffset = this.sprayCoaterOffsetList[0];
     for (let spray of this.sprayCoaterOffsetList) {
       if (spray.y > firstSprayOffset.y) {
