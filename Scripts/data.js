@@ -4164,10 +4164,39 @@ var data = [
       },
       {
         name: "处理器",
-        n: 2,
+        n: 3,
       },
     ],
     t: 5,
+  },
+  {
+    s: [
+      {
+        name: "全息信标",
+        n: 1,
+      },
+    ],
+    group: "建筑",
+    m: "制作台",
+    q: [
+      {
+        name: "铁块",
+        n: 3,
+      },
+      {
+        name: "棱镜",
+        n: 4,
+      },
+      {
+        name: "电浆激发器",
+        n: 2,
+      },
+      {
+        name: "电路板",
+        n: 2,
+      },
+    ],
+    t: 4,
   },
 ];
 var manualGzSpeed = false; //是否采用手动输入的临界光子每分钟产量
@@ -4214,7 +4243,7 @@ spaceData["粒子对撞机"] = 45;
 var defaultAccType = "增产剂Mk.Ⅰ";
 var defaultAccValue = "无";
 
-var version = "20240202"; //版本号，用来更新data.json的缓存
+var version = "20261004"; //版本号，用来更新data.json的缓存
 
 function f_initData() {
   $(data).each(function (i, item) {
@@ -6275,6 +6304,7 @@ function getRecipe() {
     ["压制胶囊", "压制胶囊"],
     ["近程电浆炮", "近程电浆炮"],
 	["干扰塔", "干扰塔"],
+    ["全息信标", "全息信标"],
     ["None", "None"],
   ];
   let outputHasHydrogen = false;
