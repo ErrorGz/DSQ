@@ -175,6 +175,14 @@
             margin: 5px;
         }
 
+        /* 参数设置里的补充说明：限制宽度，避免撑宽整个面板（约等于 label 160px + textbox 85px 的行宽） */
+        #MoreSetting .setting-tip {
+            display: inline-block;
+            max-width: 250px;
+            color: #888;
+            line-height: 1.5;
+        }
+
         #txtnumber,
         #txtore {
             width: 40px;
