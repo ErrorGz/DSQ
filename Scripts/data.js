@@ -4473,6 +4473,24 @@ var singleMake = [];
 var xqss = [];
 var game_data = {};
 var isDataLoaded = false;
+
+//隐藏首次加载的 Loading 遮罩（淡出后移除，恢复页面操作）
+function f_hideLoading() {
+  var $overlay = $("#loadingOverlay");
+  if (!$overlay.length) return;
+  $overlay.addClass("fade-out");
+  setTimeout(function () {
+    $overlay.remove();
+  }, 400);
+}
+//加载失败时更新遮罩提示，仍保持遮罩禁止操作
+function f_loadingError(msg) {
+  $("#loadingSpinner").hide();
+  $("#loadingText").html(
+    msg + '，请<a href="javascript:location.reload()" style="color:#8fc6ff;">刷新重试</a>'
+  );
+}
+
 $(function () {
   $.ajax({
     url: "./Scripts/data.json?v" + version,
@@ -4483,9 +4501,10 @@ $(function () {
       isDataLoaded = true;
       f_initIcons();
       addOptions();
+      f_hideLoading();
     },
     error: function () {
-      alert("游戏资源加载失败，图标将无法显示正常，请刷新再试");
+      f_loadingError("游戏资源加载失败，图标将无法显示正常");
     },
   });
 
@@ -5958,7 +5977,8 @@ function f_save() {
 }
 function f_add() {
   if (!isDataLoaded) {
-    alert("游戏资源尚未加载完毕");
+    $("#loadingText").text("游戏资源尚未加载完毕，请稍候…");
+    return;
   }
   $("#UIselector").show();
 }
