@@ -98,7 +98,9 @@
     <div style="display: flex;">
       <div style="margin-right: 50px;">
         <h4>速度、产量设置：</h4>
-        <p><span class="label">采矿作业速度： </span><input id="selore" class="textbox" type="number" value="100" />% </p>
+        <p><span class="label">采矿作业速度： </span><input id="selore" class="textbox" type="number" value="100" />%
+          <br /><small style="margin-left:160px;color:#888;">注：1 台小矿机默认按 <b>6 个矿脉</b> 折算（单脉 0.5/s × 6 = 3/s，速度上限 30）；大型采矿机按 20 个矿脉折算。矿脉数为内置常量，不可调整。</small>
+        </p>
         <p><span class="label">分馏塔每分钟产量： </span><input id="fractionatorSpeed" class="textbox" type="number"
             value="18" /> </p>
         <p><span class="label">大型采矿机：</span><input id="speed1_6" class="textbox" type="number" value="100" /> </p>
