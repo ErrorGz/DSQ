@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN" class="boot">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>戴森球计划量产量化计算器（简易版）</title>
+<meta name="description" content="《戴森球计划》量产计算器：选目标物品和每分钟产量，算出每种设备要几台、要多少原料。">
+<link rel="icon" href="../favicon.ico">
+<link rel="preload" href="calc-icons.avif" as="image" type="image/avif">
+<!-- 三个都是普通脚本（浏览器不让直接双击打开的网页用模块和 fetch），defer：一起下载、按顺序跑。
+     本站 Scripts/data.js 的后半是老页面的 jQuery 代码，只有一个 $(function…)，$ 先换成空函数就不跑 -->
+<script>window.$ = window.jQuery = function () {};</script>
+<script defer src="../Scripts/data.js"></script>
+<script defer src="calc-icons.js"></script>
+<script defer src="calc.js?v=tabs2"></script>
+<link rel="stylesheet" href="style.css?v=3">
+<script>
+/* 记住上次选的版本：上次点过「切换原版」，这次再直接进新版的地址就回原版去；
+   点「切换新版」时又会记住新版。链接带 ?ver=new / ?ver=old 可临时指定（也会记住）。 */
+(function () {
+  var KEY = 'dsq-ver';
+  function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  window.dsqGo = function (ver, url) { set(ver); location.href = url; };
+  var q = '';
+  try { q = new URLSearchParams(location.search).get('ver') || ''; } catch (e) {}
+  if (q === 'new' || q === 'old') set(q);
+  if (get() === 'old') location.replace('../');
+})();
+</script>
+<script>
+/* 深浅色：与原版（站点根目录）共用 dsq-theme —— 在哪个版本里切了，另一个版本进来也是同一个深浅色。
+   样式都在 style.css 里，深色变量由 <html data-theme="dark"> 命中（见 style.css 里 html[data-theme="dark"] 那一段）。
+   web/index.template.html 里有一样的一份 */
+(function () {
+  var KEY = 'dsq-theme';      // 与原版（站点根目录）共用：进哪个版本都是同一个深浅色
+  var LEGACY = 'dsphc-theme'; // 本目录的蓝图生成器还认这个旧格式（带「当时系统深浅」），照旧写一份
+  var mq = matchMedia('(prefers-color-scheme: dark)');
+  var sys = function () { return mq.matches ? 'dark' : 'light'; };
+  var saved = function () {
+    var t = null;
+    try { t = localStorage.getItem(KEY); } catch (e) {}
+    if (t === 'dark' || t === 'light') return t;
+    try {
+      var o = JSON.parse(localStorage.getItem(LEGACY)); // 旧存档：当时系统深浅还对得上才算数
+      if (o && (o.t === 'dark' || o.t === 'light') && o.sys === sys()) return o.t;
+    } catch (e) {}
+    return null;
+  };
+  var apply = function (t) {
+    t = t === 'dark' || t === 'light' ? t : saved() || 'dark'; // 没选过就深色，和原版一致
+    document.documentElement.setAttribute('data-theme', t);
+    try {
+      localStorage.setItem(KEY, t);
+      localStorage.setItem(LEGACY, JSON.stringify({ t: t, sys: sys() }));
+    } catch (e) {}
+    dispatchEvent(new Event('themechange'));
+  };
+  window.dsphcTheme = function (t) { apply(t); };
+  addEventListener('storage', function (e) { if (e.key === KEY) apply(); });
+  apply();
+})();
+</script>
+</head>
+<body>
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a class="brand" href="./index.html" title="刷新本页">
+      <img class="logo" src="../favicon.ico" alt="logo" />
+      <h1>戴森球计划量产量化计算器</h1>
+      <span class="sub">DSP Production Calculator</span>
+    </a>
+    <div class="header-actions">
+      <button class="ver-switch" type="button" title="原版：更多选项与细节，和主站计算器一样；选过之后下次打开本站会直接进原版" onclick="dsqGo('old','../')">切换原版</button>
+      <button id="themeToggle" type="button" data-act="theme" title="切换深浅主题">🌙 深色模式</button>
+    </div>
+  </div>
+</header>
+
+              <!-- 广告开始 ->
+
+              <!- 广告结束 -->
+
+<!-- 页签行：自己一条，不跟 banner 粘在一起——左边 需求模式 / 供给模式 计算模式，右边像浏览器标签页一样的各个页面 -->
+<div class="tabs-bar" id="tabsBar">
+  <div class="toggle mode" id="mode" role="group" aria-label="需求模式 / 供给模式">
+    <button type="button" data-act="mode" data-m="demand" aria-pressed="false" title="需求模式：只算整条线要多少">需求模式</button>
+    <button type="button" data-act="mode" data-m="supply" aria-pressed="true" title="供给模式：每生成一张蓝图，它做的东西就标成已完成、从清单里扣掉，清单剩下的就是还要做的；点「已完成」旁边的 × 能撤回，别的页面做完了可以「归档」并进总页面">供给模式</button>
+  </div>
+  <div class="plans" id="plans" role="tablist" aria-label="各个页面"></div>
+  <button class="plan-add" type="button" data-act="tab-add" title="添加页面" aria-label="添加页面"><i class="ico i-plus" aria-hidden="true"></i></button>
+</div>
+<script>
+/* 页头、页签行的高度随字号 / 缩放变化，量一次写进 --header-h / --tabs-h / --strip-h（吸顶都靠它） */
+(function () {
+  var h = document.getElementById('siteHeader');
+  var t = document.getElementById('tabsBar');
+  if (!h || !t) return;
+  var apply = function () {
+    var a = h.offsetHeight, b = t.offsetHeight, root = document.documentElement.style;
+    root.setProperty('--header-h', a + 'px');
+    root.setProperty('--tabs-h', b + 'px');
+    root.setProperty('--strip-h', (a + b) + 'px');
+  };
+  apply();
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(apply);
+    ro.observe(h);
+    ro.observe(t);
+  }
+  addEventListener('resize', apply);
+})();
+</script>
+<div class="app">
+  <aside class="side" aria-label="目标和设置">
+    <div class="group">
+      <span class="group-label">目标产物</span>
+      <ul class="goals" id="goals"></ul>
+      <button class="add" type="button" data-act="add-goal"><i class="ico i-plus"></i>添加目标</button>
+    </div>
+    <div class="group" id="rare-box" hidden>
+      <span class="group-label">珍奇矿</span>
+      <ul class="chips" id="rare"></ul>
+    </div>
+    <div class="group">
+      <span class="group-label">外部供应</span>
+      <ul class="chips" id="ext"></ul>
+      <p class="hint">点清单每行右边的「外部」，那样东西就改从别处运来</p>
+    </div>
+    <div class="actions">
+      <button class="go" type="button" data-act="blueprint" aria-disabled="true" aria-describedby="pick-hint">生成蓝图</button>
+      <div class="go-row" id="beltless-help">
+        <button class="go-2" type="button" data-act="beltless" aria-disabled="true" aria-describedby="pick-hint">生成无带蓝图</button>
+        <button class="help-btn" type="button" data-act="help" aria-label="无带流是什么" aria-describedby="beltless-tip" aria-expanded="false">?</button>
+        <span class="tip" id="beltless-tip" role="tooltip"><b>无带流是什么</b>设备挤在一起，之间不铺传送带。旁边留一片传送带区，很多条传送带并排放着，分拣器直接从设备连到区里的带子上取货、放货，所以占地很小。<span><b>怎么用：</b>蓝图贴下去建好一遍后，整片拆掉、原地重建一次，分拣器才会全部连上。</span></span>
+      </div>
+      <p class="hint pick-hint" id="pick-hint" aria-live="polite"></p>
+    </div>
+    <p class="forecast" id="forecast"></p>
+    <footer class="links">
+      <span>此新版由<a href="https://github.com/zoujack018/dsp-handcraft" target="_blank" rel="noopener"> dsp-handcraft </a>创建</span>
+    </footer>
+  </aside>
+  <main class="main">
+    <nav class="toolbar" id="toolbar" aria-label="设备型号和增产剂"></nav>
+    <header class="sheet-head">
+      <h2 id="sheet-title">生产清单</h2>
+      <div class="sheet-done" id="sheet-done" hidden><span class="done-mark"><i class="ico i-check" aria-hidden="true"></i>已完成</span><button class="archive-btn" type="button" data-act="archive" title="这一页的目标并进总页面">归档</button></div>
+    </header>
+    <section class="panel summary" id="summary" aria-labelledby="sheet-title" hidden>
+      <div class="stats" id="stats" role="tablist" aria-label="合计"></div>
+      <div class="tile-panel" id="tile-panel" role="tabpanel"></div>
+    </section>
+    <div class="sheet" id="body"><p class="loading">正在载入配方…</p></div>
+  </main>
+</div>
+
+<dialog id="picker" aria-labelledby="picker-title">
+  <div class="dlg">
+    <div class="dlg-head">
+      <h2 id="picker-title">选择目标产物</h2>
+      <div class="toggle" id="tabs" role="group" aria-label="分类">
+        <button type="button" data-tab="1" aria-pressed="true">物品</button>
+        <button type="button" data-tab="2" aria-pressed="false">建筑</button>
+      </div>
+      <label class="find-wrap"><i class="ico i-search"></i><input class="find" id="find" type="search" placeholder="搜索物品" autocomplete="off" aria-label="搜索物品"></label>
+      <button class="close" type="button" data-act="close-picker" aria-label="关闭"><i class="ico i-x"></i></button>
+    </div>
+    <div class="slots" id="slots"></div>
+  </div>
+</dialog>
+<div class="menu" id="menu" role="menu" hidden></div>
+</body>
+</html>

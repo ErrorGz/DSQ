@@ -4,6 +4,7 @@ var data = [
 {
     s: [{				s ：产物一(可能多产物)
         name: "重氢",	name ：产物名称
+        itemId: 1121,	itemId ：游戏物品 ID（生成蓝图用，同一物品写一处即可）
         n: 0.01			n ：数量(如果不提供就是1)
     }, {					产物二(可能多产物)
         name: "氢",		name ：产物名称
@@ -17,6 +18,7 @@ var data = [
     }],
     t: 1,				t ：生产时间(秒)
     noExtra: true,		noExtra(添加增产剂是否不可"增产"): false(不填写该行时的默认值,加速/增产), true(加速), null(无效果;如能量枢纽为蓄电池充能的特例; 没有q属性的物品,如原矿类无需填写本行)
+    gameId: 1,			gameId ：游戏配方 ID（生成蓝图用，编号可查 https://github.com/komonad/dsp-solver/blob/main/data/Vanilla.json）
 },
 */
 
@@ -24,6 +26,7 @@ var data = [
     s: [
       {
         name: "宇宙矩阵",
+        itemId: 6006,
       },
     ],
     q: [
@@ -55,11 +58,13 @@ var data = [
     t: 15,
     m: "研究站",
     group: "产品",
+    gameId: 75,
   },
   {
     s: [
       {
         name: "铁矿",
+        itemId: 1001,
       },
     ],
     q: [],
@@ -70,6 +75,7 @@ var data = [
     s: [
       {
         name: "铜矿",
+        itemId: 1002,
       },
     ],
     q: [],
@@ -80,6 +86,7 @@ var data = [
     s: [
       {
         name: "煤矿",
+        itemId: 1006,
       },
     ],
     q: [],
@@ -90,6 +97,7 @@ var data = [
     s: [
       {
         name: "石矿",
+        itemId: 1005,
       },
     ],
     q: [],
@@ -100,6 +108,7 @@ var data = [
     s: [
       {
         name: "钛石",
+        itemId: 1004,
       },
     ],
     q: [],
@@ -110,6 +119,7 @@ var data = [
     s: [
       {
         name: "原油",
+        itemId: 1007,
       },
     ],
     q: [],
@@ -120,6 +130,7 @@ var data = [
     s: [
       {
         name: "水",
+        itemId: 1000,
       },
     ],
     q: [],
@@ -130,6 +141,7 @@ var data = [
     s: [
       {
         name: "硅石",
+        itemId: 1003,
       },
     ],
     q: [],
@@ -140,6 +152,7 @@ var data = [
     s: [
       {
         name: "蓄电池满",
+        itemId: 2207,
       },
     ],
     q: [
@@ -155,6 +168,7 @@ var data = [
     s: [
       {
         name: "蓝矩阵",
+        itemId: 6001,
       },
     ],
     q: [
@@ -170,11 +184,13 @@ var data = [
     t: 3,
     m: "研究站",
     group: "产品",
+    gameId: 9,
   },
   {
     s: [
       {
         name: "红矩阵",
+        itemId: 6002,
       },
     ],
     q: [
@@ -190,11 +206,13 @@ var data = [
     t: 6,
     m: "研究站",
     group: "产品",
+    gameId: 18,
   },
   {
     s: [
       {
         name: "黄矩阵",
+        itemId: 6003,
       },
     ],
     q: [
@@ -210,11 +228,13 @@ var data = [
     t: 8,
     m: "研究站",
     group: "产品",
+    gameId: 27,
   },
   {
     s: [
       {
         name: "紫矩阵",
+        itemId: 6004,
       },
     ],
     q: [
@@ -230,11 +250,13 @@ var data = [
     t: 10,
     m: "研究站",
     group: "产品",
+    gameId: 55,
   },
   {
     s: [
       {
         name: "绿矩阵",
+        itemId: 6005,
         n: 2,
       },
     ],
@@ -251,11 +273,13 @@ var data = [
     t: 24,
     m: "研究站",
     group: "产品",
+    gameId: 102,
   },
   {
     s: [
       {
         name: "空间翘曲器",
+        itemId: 1210,
         n: 8,
       },
     ],
@@ -268,6 +292,7 @@ var data = [
       },
     ],
     t: 10,
+    gameId: 79,
   },
   {
     s: [
@@ -285,11 +310,13 @@ var data = [
       },
     ],
     t: 10,
+    gameId: 78,
   },
   {
     s: [
       {
         name: "氘核燃料棒",
+        itemId: 1802,
         n: 2,
       },
     ],
@@ -310,11 +337,13 @@ var data = [
       },
     ],
     t: 12,
+    gameId: 41,
   },
   {
     s: [
       {
         name: "引力透镜",
+        itemId: 1209,
         n: 1,
       },
     ],
@@ -331,6 +360,30 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 101,
+  },
+  {
+    s: [
+      {
+        name: "黑雾引力透镜",
+        itemId: 1211,
+        n: 1,
+      },
+    ],
+    group: "消耗品",
+    m: "制作台",
+    q: [
+      {
+        name: "引力透镜",
+        n: 1,
+      },
+      {
+        name: "黑雾矩阵",
+        n: 12,
+      },
+    ],
+    t: 6,
+    gameId: 162,
   },
   {
     s: [
@@ -346,11 +399,13 @@ var data = [
     ],
     m: "冶炼设备",
     t: 10,
+    gameId: 34,
   },
   {
     s: [
       {
         name: "铁块",
+        itemId: 1101,
       },
     ],
     group: "组件",
@@ -362,11 +417,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 1,
   },
   {
     s: [
       {
         name: "钢材",
+        itemId: 1103,
       },
     ],
     group: "组件",
@@ -378,11 +435,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 63,
   },
   {
     s: [
       {
         name: "钛块",
+        itemId: 1106,
       },
     ],
     group: "组件",
@@ -394,11 +453,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 65,
   },
   {
     s: [
       {
         name: "铜块",
+        itemId: 1104,
       },
     ],
     group: "组件",
@@ -410,11 +471,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 3,
   },
   {
     s: [
       {
         name: "磁铁",
+        itemId: 1102,
       },
     ],
     group: "组件",
@@ -426,11 +489,13 @@ var data = [
       },
     ],
     t: 1.5,
+    gameId: 2,
   },
   {
     s: [
       {
         name: "磁线圈",
+        itemId: 1202,
         n: 2,
       },
     ],
@@ -447,11 +512,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 6,
   },
   {
     s: [
       {
         name: "电路板",
+        itemId: 1301,
         n: 2,
       },
     ],
@@ -468,11 +535,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 50,
   },
   {
     s: [
       {
         name: "齿轮",
+        itemId: 1201,
       },
     ],
     group: "组件",
@@ -484,11 +553,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 5,
   },
   {
     s: [
       {
         name: "高级石墨",
+        itemId: 1109,
       },
     ],
     group: "组件",
@@ -500,11 +571,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 17,
   },
   {
     s: [
       {
         name: "重氢",
+        itemId: 1121,
       },
     ],
     group: "组件",
@@ -517,6 +590,7 @@ var data = [
     s: [
       {
         name: "氢",
+        itemId: 1120,
       },
     ],
     group: "组件",
@@ -543,6 +617,7 @@ var data = [
       },
       {
         name: "精炼油",
+        itemId: 1114,
         n: 2,
       },
     ],
@@ -555,6 +630,7 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 16,
   },
   {
     s: [
@@ -581,6 +657,7 @@ var data = [
     ],
     t: 4,
     noExtra: true,
+    gameId: 121,
   },
   {
     s: [
@@ -590,6 +667,7 @@ var data = [
       },
       {
         name: "石墨烯",
+        itemId: 1123,
         n: 2,
       },
     ],
@@ -602,11 +680,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 32,
   },
   {
     s: [
       {
         name: "可燃冰",
+        itemId: 1011,
       },
     ],
     group: "组件",
@@ -629,6 +709,7 @@ var data = [
     s: [
       {
         name: "刺笋结晶",
+        itemId: 1015,
       },
     ],
     group: "组件",
@@ -640,6 +721,7 @@ var data = [
     s: [
       {
         name: "玻璃",
+        itemId: 1110,
         n: 1,
       },
     ],
@@ -652,11 +734,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 57,
   },
   {
     s: [
       {
         name: "棱镜",
+        itemId: 1111,
         n: 2,
       },
     ],
@@ -669,11 +753,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 11,
   },
   {
     s: [
       {
         name: "高纯硅块",
+        itemId: 1105,
         n: 1,
       },
     ],
@@ -686,11 +772,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 59,
   },
   {
     s: [
       {
         name: "微晶元件",
+        itemId: 1302,
         n: 1,
       },
     ],
@@ -707,11 +795,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 53,
   },
   {
     s: [
       {
         name: "处理器",
+        itemId: 1303,
         n: 1,
       },
     ],
@@ -728,11 +818,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 51,
   },
   {
     s: [
       {
         name: "金刚石",
+        itemId: 1112,
         n: 1,
       },
     ],
@@ -745,11 +837,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 60,
   },
   {
     s: [
       {
         name: "塑料",
+        itemId: 1115,
         n: 1,
       },
     ],
@@ -766,11 +860,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 23,
   },
   {
     s: [
       {
         name: "有机晶体",
+        itemId: 1117,
         n: 1,
       },
     ],
@@ -791,6 +887,7 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 25,
   },
   {
     s: [
@@ -807,6 +904,7 @@ var data = [
     s: [
       {
         name: "钛晶石",
+        itemId: 1118,
         n: 1,
       },
     ],
@@ -823,11 +921,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 26,
   },
   {
     s: [
       {
         name: "晶格硅",
+        itemId: 1113,
         n: 1,
       },
     ],
@@ -840,11 +940,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 37,
   },
   {
     s: [
       {
         name: "石材",
+        itemId: 1108,
         n: 1,
       },
     ],
@@ -857,11 +959,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 4,
   },
   {
     s: [
       {
         name: "电动机",
+        itemId: 1203,
         n: 1,
       },
     ],
@@ -882,11 +986,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 97,
   },
   {
     s: [
       {
         name: "电磁涡轮",
+        itemId: 1204,
         n: 1,
       },
     ],
@@ -903,11 +1009,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 98,
   },
   {
     s: [
       {
         name: "硫酸",
+        itemId: 1116,
         n: 4,
       },
     ],
@@ -928,6 +1036,7 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 24,
   },
   {
     s: [
@@ -949,11 +1058,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 31,
   },
   {
     s: [
       {
         name: "碳纳米管",
+        itemId: 1124,
         n: 2,
       },
     ],
@@ -970,6 +1081,7 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 33,
   },
   {
     s: [
@@ -987,11 +1099,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 35,
   },
   {
     s: [
       {
         name: "粒子带宽",
+        itemId: 1402,
         n: 1,
       },
     ],
@@ -1012,11 +1126,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 36,
   },
   {
     s: [
       {
         name: "钛化玻璃",
+        itemId: 1119,
         n: 2,
       },
     ],
@@ -1037,11 +1153,13 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 30,
   },
   {
     s: [
       {
         name: "卡西米尔晶片",
+        itemId: 1126,
         n: 1,
       },
     ],
@@ -1062,11 +1180,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 28,
   },
   {
     s: [
       {
         name: "位面过滤器",
+        itemId: 1304,
         n: 1,
       },
     ],
@@ -1083,11 +1203,13 @@ var data = [
       },
     ],
     t: 12,
+    gameId: 38,
   },
   {
     s: [
       {
         name: "量子芯片",
+        itemId: 1305,
         n: 1,
       },
     ],
@@ -1104,11 +1226,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 52,
   },
   {
     s: [
       {
         name: "粒子容器",
+        itemId: 1206,
         n: 1,
       },
     ],
@@ -1129,6 +1253,7 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 99,
   },
   {
     s: [
@@ -1147,11 +1272,13 @@ var data = [
     ],
     t: 2.5,
     noExtra: true,
+    gameId: 40,
   },
   {
     s: [
       {
         name: "奇异物质",
+        itemId: 1127,
         n: 1,
       },
     ],
@@ -1172,11 +1299,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 104,
   },
   {
     s: [
       {
         name: "临界光子",
+        itemId: 1208,
         n: 1,
       },
     ],
@@ -1189,6 +1318,7 @@ var data = [
     s: [
       {
         name: "反物质",
+        itemId: 1122,
         n: 2,
       },
       {
@@ -1206,11 +1336,13 @@ var data = [
     ],
     t: 2,
     noExtra: true,
+    gameId: 74,
   },
   {
     s: [
       {
         name: "超级磁场环",
+        itemId: 1205,
         n: 1,
       },
     ],
@@ -1231,11 +1363,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 103,
   },
   {
     s: [
       {
         name: "钛合金",
+        itemId: 1107,
         n: 4,
       },
     ],
@@ -1256,11 +1390,13 @@ var data = [
       },
     ],
     t: 12,
+    gameId: 66,
   },
   {
     s: [
       {
         name: "电浆激发器",
+        itemId: 1401,
         n: 1,
       },
     ],
@@ -1277,11 +1413,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 12,
   },
   {
     s: [
       {
         name: "框架材料",
+        itemId: 1125,
         n: 1,
       },
     ],
@@ -1302,11 +1440,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 80,
   },
   {
     s: [
       {
         name: "光子合并器",
+        itemId: 1404,
         n: 1,
       },
     ],
@@ -1323,11 +1463,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 68,
   },
   {
     s: [
       {
         name: "太阳帆",
+        itemId: 1501,
         n: 2,
       },
     ],
@@ -1344,11 +1486,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 70,
   },
   {
     s: [
       {
         name: "戴森球组件",
+        itemId: 1502,
         n: 1,
       },
     ],
@@ -1369,11 +1513,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 81,
   },
   {
     s: [
       {
         name: "小型运载火箭",
+        itemId: 1503,
         n: 1,
       },
     ],
@@ -1394,11 +1540,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 83,
   },
   {
     s: [
       {
         name: "增产剂Mk.Ⅰ",
+        itemId: 1141,
         n: 1,
       },
     ],
@@ -1411,11 +1559,13 @@ var data = [
       },
     ],
     t: 0.5,
+    gameId: 106,
   },
   {
     s: [
       {
         name: "增产剂Mk.Ⅱ",
+        itemId: 1142,
         n: 1,
       },
     ],
@@ -1432,11 +1582,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 107,
   },
   {
     s: [
       {
         name: "增产剂Mk.Ⅲ",
+        itemId: 1143,
         n: 1,
       },
     ],
@@ -1453,6 +1605,7 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 108,
   },
   {
     s: [
@@ -1470,6 +1623,7 @@ var data = [
     s: [
       {
         name: "光栅石",
+        itemId: 1014,
       },
     ],
     q: [],
@@ -1500,11 +1654,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 29,
   },
   {
     s: [
       {
         name: "单极磁石",
+        itemId: 1016,
       },
     ],
     q: [],
@@ -1531,11 +1687,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 100,
   },
   {
     s: [
       {
         name: "金伯利矿石",
+        itemId: 1012,
       },
     ],
     q: [],
@@ -1558,11 +1716,13 @@ var data = [
       },
     ],
     t: 1.5,
+    gameId: 61,
   },
   {
     s: [
       {
         name: "分形硅石",
+        itemId: 1013,
       },
     ],
     q: [],
@@ -1585,11 +1745,13 @@ var data = [
       },
     ],
     t: 1.5,
+    gameId: 62,
   },
   {
     s: [
       {
         name: "地基",
+        itemId: 1131,
         n: 1,
       },
     ],
@@ -1606,11 +1768,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 112,
   },
   {
     s: [
       {
         name: "液氢燃料棒",
+        itemId: 1801,
         n: 2,
       },
     ],
@@ -1627,11 +1791,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 19,
   },
   {
     s: [
       {
         name: "电力感应塔",
+        itemId: 2201,
         n: 1,
       },
     ],
@@ -1648,11 +1814,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 8,
   },
   {
     s: [
       {
         name: "无线输电塔",
+        itemId: 2202,
         n: 1,
       },
     ],
@@ -1670,11 +1838,13 @@ var data = [
     ],
     t: 3,
     noExtra: true,
+    gameId: 13,
   },
   {
     s: [
       {
         name: "卫星配电站",
+        itemId: 2212,
         n: 1,
       },
     ],
@@ -1696,11 +1866,13 @@ var data = [
     ],
     t: 5,
     noExtra: true,
+    gameId: 73,
   },
   {
     s: [
       {
         name: "风力涡轮机",
+        itemId: 2203,
         n: 1,
       },
     ],
@@ -1721,11 +1893,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 7,
   },
   {
     s: [
       {
         name: "火力发电机",
+        itemId: 2204,
         n: 1,
       },
     ],
@@ -1750,11 +1924,13 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 64,
   },
   {
     s: [
       {
         name: "传送带",
+        itemId: 2001,
         n: 3,
       },
     ],
@@ -1771,11 +1947,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 84,
   },
   {
     s: [
       {
         name: "高速传送带",
+        itemId: 2002,
         n: 3,
       },
     ],
@@ -1793,11 +1971,13 @@ var data = [
     ],
     t: 1,
     noExtra: true,
+    gameId: 89,
   },
   {
     s: [
       {
         name: "极速传送带",
+        itemId: 2003,
         n: 3,
       },
     ],
@@ -1819,11 +1999,13 @@ var data = [
     ],
     t: 1,
     noExtra: true,
+    gameId: 92,
   },
   {
     s: [
       {
         name: "小型储物仓",
+        itemId: 2101,
         n: 1,
       },
     ],
@@ -1840,11 +2022,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 86,
   },
   {
     s: [
       {
         name: "大型储物仓",
+        itemId: 2102,
         n: 1,
       },
     ],
@@ -1861,11 +2045,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 91,
   },
   {
     s: [
       {
         name: "太阳能板",
+        itemId: 2205,
         n: 1,
       },
     ],
@@ -1886,11 +2072,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 67,
   },
   {
     s: [
       {
         name: "蓄电池",
+        itemId: 2206,
         n: 1,
       },
     ],
@@ -1911,11 +2099,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 76,
   },
   {
     s: [
       {
         name: "射线接收站",
+        itemId: 2208,
         n: 1,
       },
     ],
@@ -1944,11 +2134,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 72,
   },
   {
     s: [
       {
         name: "微型聚变发电站",
+        itemId: 2211,
         n: 1,
       },
     ],
@@ -1973,11 +2165,13 @@ var data = [
       },
     ],
     t: 10,
+    gameId: 113,
   },
   {
     s: [
       {
         name: "能量枢纽",
+        itemId: 2209,
         n: 1,
       },
     ],
@@ -2002,11 +2196,13 @@ var data = [
       },
     ],
     t: 15,
+    gameId: 77,
   },
   {
     s: [
       {
         name: "储液灌",
+        itemId: 2106,
         n: 1,
       },
     ],
@@ -2027,11 +2223,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 114,
   },
   {
     s: [
       {
         name: "分拣器",
+        itemId: 2011,
       },
     ],
     group: "建筑",
@@ -2047,11 +2245,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 85,
   },
   {
     s: [
       {
         name: "高速分拣器",
+        itemId: 2012,
         n: 2,
       },
     ],
@@ -2069,11 +2269,13 @@ var data = [
     ],
     t: 1,
     noExtra: true,
+    gameId: 88,
   },
   {
     s: [
       {
         name: "极速分拣器",
+        itemId: 2013,
         n: 2,
       },
     ],
@@ -2091,11 +2293,13 @@ var data = [
     ],
     t: 1,
     noExtra: true,
+    gameId: 90,
   },
   {
     s: [
       {
         name: "采矿机",
+        itemId: 2301,
         n: 1,
       },
     ],
@@ -2120,11 +2324,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 48,
   },
   {
     s: [
       {
         name: "抽水机",
+        itemId: 2306,
         n: 1,
       },
     ],
@@ -2149,11 +2355,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 49,
   },
   {
     s: [
       {
         name: "原油萃取站",
+        itemId: 2307,
         n: 1,
       },
     ],
@@ -2178,11 +2386,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 14,
   },
   {
     s: [
       {
         name: "原油精炼厂",
+        itemId: 2308,
         n: 1,
       },
     ],
@@ -2207,11 +2417,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 15,
   },
   {
     s: [
       {
         name: "垂直发射井",
+        itemId: 2312,
         n: 1,
       },
     ],
@@ -2236,11 +2448,13 @@ var data = [
       },
     ],
     t: 30,
+    gameId: 82,
   },
   {
     s: [
       {
         name: "四向分流器",
+        itemId: 2020,
         n: 1,
       },
     ],
@@ -2261,11 +2475,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 87,
   },
   {
     s: [
       {
         name: "流速监测器",
+        itemId: 2030,
         n: 1,
       },
     ],
@@ -2290,11 +2506,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 117,
   },
   {
     s: [
       {
         name: "制作台Mk.Ⅰ",
+        itemId: 2303,
         n: 1,
       },
     ],
@@ -2315,11 +2533,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 45,
   },
   {
     s: [
       {
         name: "制作台Mk.Ⅱ",
+        itemId: 2304,
         n: 1,
       },
     ],
@@ -2341,11 +2561,13 @@ var data = [
     ],
     t: 3,
     noExtra: true,
+    gameId: 46,
   },
   {
     s: [
       {
         name: "制作台Mk.Ⅲ",
+        itemId: 2305,
         n: 1,
       },
     ],
@@ -2367,11 +2589,13 @@ var data = [
     ],
     t: 4,
     noExtra: true,
+    gameId: 47,
   },
   {
     s: [
       {
         name: "电弧熔炉",
+        itemId: 2302,
         n: 1,
       },
     ],
@@ -2396,11 +2620,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 56,
   },
   {
     s: [
       {
         name: "位面熔炉",
+        itemId: 2315,
         n: 1,
       },
     ],
@@ -2426,11 +2652,13 @@ var data = [
     ],
     t: 5,
     noExtra: true,
+    gameId: 116,
   },
   {
     s: [
       {
         name: "分馏塔",
+        itemId: 2314,
         n: 1,
       },
     ],
@@ -2455,11 +2683,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 110,
   },
   {
     s: [
       {
         name: "化工厂",
+        itemId: 2309,
         n: 1,
       },
     ],
@@ -2484,11 +2714,13 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 22,
   },
   {
     s: [
       {
         name: "量子化工厂",
+        itemId: 2317,
         n: 1,
       },
     ],
@@ -2514,11 +2746,13 @@ var data = [
     ],
     t: 10,
     noExtra: true,
+    gameId: 124,
   },
   {
     s: [
       {
         name: "矩阵研究站",
+        itemId: 2901,
         n: 1,
       },
     ],
@@ -2543,11 +2777,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 10,
   },
   {
     s: [
       {
         name: "电磁轨道弹射器",
+        itemId: 2311,
         n: 1,
       },
     ],
@@ -2572,11 +2808,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 71,
   },
   {
     s: [
       {
         name: "行星内物流运输站",
+        itemId: 2103,
         n: 1,
       },
     ],
@@ -2601,11 +2839,13 @@ var data = [
       },
     ],
     t: 20,
+    gameId: 93,
   },
   {
     s: [
       {
         name: "物流配送器",
+        itemId: 2107,
         n: 1,
       },
     ],
@@ -2626,11 +2866,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 122,
   },
   {
     s: [
       {
         name: "微型粒子对撞机",
+        itemId: 2310,
         n: 1,
       },
     ],
@@ -2659,11 +2901,13 @@ var data = [
       },
     ],
     t: 15,
+    gameId: 39,
   },
   {
     s: [
       {
         name: "星际物流运输站",
+        itemId: 2104,
         n: 1,
       },
     ],
@@ -2685,11 +2929,13 @@ var data = [
     ],
     t: 30,
     noExtra: true,
+    gameId: 95,
   },
   {
     s: [
       {
         name: "加力推进器",
+        itemId: 1406,
         n: 1,
       },
     ],
@@ -2706,11 +2952,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 21,
   },
   {
     s: [
       {
         name: "轨道采集器",
+        itemId: 2105,
         n: 1,
       },
     ],
@@ -2736,11 +2984,13 @@ var data = [
     ],
     t: 30,
     noExtra: true,
+    gameId: 111,
   },
   {
     s: [
       {
         name: "推进器",
+        itemId: 1405,
         n: 1,
       },
     ],
@@ -2757,11 +3007,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 20,
   },
   {
     s: [
       {
         name: "配送运输机",
+        itemId: 5003,
         n: 1,
       },
     ],
@@ -2782,11 +3034,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 123,
   },
   {
     s: [
       {
         name: "物流运输机",
+        itemId: 5001,
         n: 1,
       },
     ],
@@ -2808,11 +3062,13 @@ var data = [
     ],
     t: 4,
     noExtra: true,
+    gameId: 94,
   },
   {
     s: [
       {
         name: "星际物流运输机",
+        itemId: 5002,
         n: 1,
       },
     ],
@@ -2834,6 +3090,7 @@ var data = [
     ],
     t: 6,
     noExtra: true,
+    gameId: 96,
   },
   {
     s: [
@@ -2855,11 +3112,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 69,
   },
   {
     s: [
       {
         name: "湮灭约束球",
+        itemId: 1403,
         n: 1,
       },
     ],
@@ -2876,11 +3135,13 @@ var data = [
       },
     ],
     t: 20,
+    gameId: 42,
   },
   {
     s: [
       {
         name: "反物质燃烧棒",
+        itemId: 1803,
         n: 2,
       },
     ],
@@ -2906,11 +3167,13 @@ var data = [
     ],
     t: 24,
     noExtra: true,
+    gameId: 44,
   },
   {
     s: [
       {
         name: "人造恒星",
+        itemId: 2210,
         n: 1,
       },
     ],
@@ -2935,11 +3198,13 @@ var data = [
       },
     ],
     t: 30,
+    gameId: 43,
   },
   {
     s: [
       {
         name: "地热发电站",
+        itemId: 2213,
         n: 1,
       },
     ],
@@ -2964,11 +3229,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 118,
   },
   {
     s: [
       {
         name: "自动集装机",
+        itemId: 2040,
         n: 1,
       },
     ],
@@ -2993,11 +3260,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 120,
   },
   {
     s: [
       {
         name: "大型采矿机",
+        itemId: 2316,
         n: 1,
       },
     ],
@@ -3026,11 +3295,13 @@ var data = [
       },
     ],
     t: 20,
+    gameId: 119,
   },
   {
     s: [
       {
         name: "喷涂机",
+        itemId: 2313,
         n: 1,
       },
     ],
@@ -3055,6 +3326,7 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 109,
   },
   {
     s: [
@@ -3081,6 +3353,7 @@ var data = [
     ],
     t: 4,
     noExtra: true,
+    gameId: 58,
   },
   {
     s: [
@@ -3103,7 +3376,26 @@ var data = [
   {
     s: [
       {
+        name: "临界光子",
+        n: 1,
+      },
+    ],
+    group: "组件",
+    m: "射线接收塔",
+    q: [
+      {
+        name: "黑雾引力透镜",
+        n: 0.016666,
+      },
+    ],
+    t: 5,
+    noExtra: true,
+  },
+  {
+    s: [
+      {
         name: "机枪弹箱",
+        itemId: 1601,
         n: 1,
       },
     ],
@@ -3116,11 +3408,13 @@ var data = [
       },
     ],
     t: 1,
+    gameId: 136,
   },
   {
     s: [
       {
         name: "钛化弹箱",
+        itemId: 1602,
         n: 1,
       },
     ],
@@ -3137,11 +3431,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 137,
   },
   {
     s: [
       {
         name: "超合金弹箱",
+        itemId: 1603,
         n: 1,
       },
     ],
@@ -3158,11 +3454,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 138,
   },
   {
     s: [
       {
         name: "燃烧单元",
+        itemId: 1128,
         n: 1,
       },
     ],
@@ -3175,11 +3473,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 133,
   },
   {
     s: [
       {
         name: "爆破单元",
+        itemId: 1129,
         n: 2,
       },
     ],
@@ -3200,11 +3500,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 134,
   },
   {
     s: [
       {
         name: "晶石爆破单元",
+        itemId: 1130,
         n: 8,
       },
     ],
@@ -3225,11 +3527,13 @@ var data = [
       },
     ],
     t: 24,
+    gameId: 135,
   },
   {
     s: [
       {
         name: "动力引擎",
+        itemId: 1407,
         n: 1,
       },
     ],
@@ -3246,11 +3550,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 105,
   },
   {
     s: [
       {
         name: "导弹组",
+        itemId: 1609,
         n: 1,
       },
     ],
@@ -3275,11 +3581,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 144,
   },
   {
     s: [
       {
         name: "超音速导弹组",
+        itemId: 1610,
         n: 2,
       },
     ],
@@ -3304,11 +3612,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 145,
   },
   {
     s: [
       {
         name: "引力导弹组",
+        itemId: 1611,
         n: 3,
       },
     ],
@@ -3329,11 +3639,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 146,
   },
   {
     s: [
       {
         name: "等离子胶囊",
+        itemId: 1607,
         n: 1,
       },
     ],
@@ -3354,11 +3666,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 142,
   },
   {
     s: [
       {
         name: "反物质胶囊",
+        itemId: 1608,
         n: 1,
       },
     ],
@@ -3383,11 +3697,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 143,
   },
   {
     s: [
       {
         name: "核心素",
+        itemId: 5205,
       },
     ],
     q: [],
@@ -3398,6 +3714,7 @@ var data = [
     s: [
       {
         name: "奇异湮灭燃料棒",
+        itemId: 1804,
         n: 1,
       },
     ],
@@ -3423,11 +3740,13 @@ var data = [
     ],
     t: 32,
     noExtra: true,
+    gameId: 156,
   },
   {
     s: [
       {
         name: "炮弹组",
+        itemId: 1604,
         n: 1,
       },
     ],
@@ -3444,11 +3763,13 @@ var data = [
       },
     ],
     t: 1.5,
+    gameId: 139,
   },
   {
     s: [
       {
         name: "高爆炮弹组",
+        itemId: 1605,
         n: 1,
       },
     ],
@@ -3469,11 +3790,13 @@ var data = [
       },
     ],
     t: 3,
+    gameId: 140,
   },
   {
     s: [
       {
         name: "晶石炮弹组",
+        itemId: 1606,
         n: 1,
       },
     ],
@@ -3494,11 +3817,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 141,
   },
   {
     s: [
       {
         name: "原型机",
+        itemId: 5101,
         n: 1,
       },
     ],
@@ -3523,11 +3848,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 147,
   },
   {
     s: [
       {
         name: "精准无人机",
+        itemId: 5102,
         n: 1,
       },
     ],
@@ -3552,11 +3879,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 148,
   },
   {
     s: [
       {
         name: "攻击无人机",
+        itemId: 5103,
         n: 1,
       },
     ],
@@ -3581,11 +3910,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 149,
   },
   {
     s: [
       {
         name: "护卫舰",
+        itemId: 5111,
         n: 1,
       },
     ],
@@ -3610,11 +3941,13 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 150,
   },
   {
     s: [
       {
         name: "驱逐舰",
+        itemId: 5112,
         n: 1,
       },
     ],
@@ -3639,11 +3972,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 151,
   },
   {
     s: [
       {
         name: "负熵奇点",
+        itemId: 5204,
       },
     ],
     q: [],
@@ -3654,6 +3989,7 @@ var data = [
     s: [
       {
         name: "能量碎片",
+        itemId: 5206,
       },
     ],
     q: [],
@@ -3664,6 +4000,7 @@ var data = [
     s: [
       {
         name: "物质重组器",
+        itemId: 5203,
       },
     ],
     q: [],
@@ -3674,6 +4011,7 @@ var data = [
     s: [
       {
         name: "负熵熔炉",
+        itemId: 2319,
         n: 1,
       },
     ],
@@ -3699,11 +4037,13 @@ var data = [
     ],
     t: 6,
     noExtra: true,
+    gameId: 155,
   },
   {
     s: [
       {
         name: "重组式制造台",
+        itemId: 2318,
         n: 1,
       },
     ],
@@ -3729,11 +4069,13 @@ var data = [
     ],
     t: 5,
     noExtra: true,
+    gameId: 154,
   },
   {
     s: [
       {
         name: "硅基神经元",
+        itemId: 5202,
       },
     ],
     q: [],
@@ -3744,6 +4086,7 @@ var data = [
     s: [
       {
         name: "黑雾矩阵",
+        itemId: 5201,
       },
     ],
     q: [],
@@ -3754,6 +4097,7 @@ var data = [
     s: [
       {
         name: "自演化研究站",
+        itemId: 2902,
         n: 1,
       },
     ],
@@ -3779,11 +4123,13 @@ var data = [
     ],
     t: 4,
     noExtra: true,
+    gameId: 153,
   },
   {
     s: [
       {
         name: "高斯机枪塔",
+        itemId: 3001,
         n: 1,
       },
     ],
@@ -3808,11 +4154,13 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 125,
   },
   {
     s: [
       {
         name: "导弹防御塔",
+        itemId: 3005,
         n: 1,
       },
     ],
@@ -3837,11 +4185,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 129,
   },
   {
     s: [
       {
         name: "聚爆加农炮",
+        itemId: 3003,
         n: 1,
       },
     ],
@@ -3866,11 +4216,13 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 127,
   },
   {
     s: [
       {
         name: "高频激光塔",
+        itemId: 3002,
         n: 1,
       },
     ],
@@ -3895,11 +4247,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 126,
   },
   {
     s: [
       {
         name: "磁化电浆炮",
+        itemId: 3004,
         n: 1,
       },
     ],
@@ -3928,11 +4282,13 @@ var data = [
       },
     ],
     t: 10,
+    gameId: 128,
   },
   {
     s: [
       {
         name: "战场分析基站",
+        itemId: 3009,
         n: 1,
       },
     ],
@@ -3957,11 +4313,13 @@ var data = [
       },
     ],
     t: 6,
+    gameId: 152,
   },
   {
     s: [
       {
         name: "信号塔",
+        itemId: 3007,
         n: 1,
       },
     ],
@@ -3983,11 +4341,13 @@ var data = [
     ],
     t: 6,
 	noExtra: true,
+    gameId: 131,
   },
   {
     s: [
       {
         name: "干扰胶囊",
+        itemId: 1612,
         n: 1,
       },
     ],
@@ -4008,11 +4368,13 @@ var data = [
       },
     ],
     t: 2,
+    gameId: 158,
   },
   {
     s: [
       {
         name: "压制胶囊",
+        itemId: 1613,
         n: 2,
       },
     ],
@@ -4033,11 +4395,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 159,
   },
   {
     s: [
       {
         name: "集装分拣器",
+        itemId: 2014,
         n: 1,
       },
     ],
@@ -4059,11 +4423,13 @@ var data = [
     ],
     t: 1,
     noExtra: true,
+    gameId: 160,
   },
   {
     s: [
       {
         name: "行星护盾发生器",
+        itemId: 3008,
         n: 1,
       },
     ],
@@ -4088,6 +4454,7 @@ var data = [
       },
     ],
     t: 10,
+    gameId: 132,
   },
   {
     s: [
@@ -4115,6 +4482,7 @@ var data = [
     s: [
       {
         name: "近程电浆炮",
+        itemId: 3010,
         n: 1,
       },
     ],
@@ -4139,11 +4507,13 @@ var data = [
       },
     ],
     t: 8,
+    gameId: 157,
   },
   {
     s: [
       {
         name: "干扰塔",
+        itemId: 3006,
         n: 1,
       },
     ],
@@ -4168,12 +4538,14 @@ var data = [
       },
     ],
     t: 5,
+    gameId: 130,
   },
   {
     s: [
       {
         name: "全息信标",
         n: 1,
+        itemId: 2401,
       },
     ],
     group: "建筑",
@@ -4197,8 +4569,36 @@ var data = [
       },
     ],
     t: 4,
+    gameId: 161,
   },
 ];
+// 游戏物品 ID（生成蓝图用）：从配方产物的 itemId 收集，缺的、对不上的打到控制台
+var GAME_ITEM_IDS = {};
+(function () {
+  var makers = ["制作台", "冶炼设备", "化工设备", "原油精炼机", "粒子对撞机", "研究站"];
+  var bad = [];
+  function note(msg) {
+    if (bad.indexOf(msg) < 0) bad.push(msg);
+  }
+  function names(list) {
+    return list.map(function (o) { return o.name; }).join("+");
+  }
+  for (var i = 0; i < data.length; i++) {
+    for (var j = 0; j < data[i].s.length; j++) {
+      var s = data[i].s[j];
+      if (!s.itemId) continue;
+      if (GAME_ITEM_IDS[s.name] && GAME_ITEM_IDS[s.name] != s.itemId) note(s.name + " 的 itemId 不一致");
+      GAME_ITEM_IDS[s.name] = s.itemId;
+    }
+  }
+  for (var i = 0; i < data.length; i++) {
+    var r = data[i];
+    var all = r.s.concat(r.q || []);
+    for (var j = 0; j < all.length; j++) if (!GAME_ITEM_IDS[all[j].name]) note(all[j].name + " 缺 itemId");
+    if (!r.gameId && makers.indexOf(r.m) >= 0) note("配方 " + names(r.q || []) + "->" + names(r.s) + " 缺 gameId");
+  }
+  if (bad.length) console.warn("data.js：" + bad.join("，"));
+})();
 var manualGzSpeed = false; //是否采用手动输入的临界光子每分钟产量
 
 var energyData = {};
@@ -4383,6 +4783,215 @@ function loadSettingProjects() {
     eval("projects = " + json);
   }
 }
+
+// ---------- 计算参数持久化 ----------
+// 「参数设置」面板 + 顶部全局选项的记忆：保存到 localStorage，下次打开自动回填。
+// 只影响“全局默认参数”，不改动逐条配方在表格里的单独选择（settings）。
+var PARAMS_KEY = "dsq-params" + version;
+var PARAM_IDS = [
+  // 参数设置面板
+  "selore", // 采矿作业速度 %
+  "fractionatorSpeed", // 分馏塔每分钟产量
+  "speed1_6", // 大型采矿机 %
+  "oilSpeed", // 原油速度
+  "speed1_1", // 轨道采集-氢(气态)
+  "speed1_2", // 轨道采集-重氢
+  "speed1_3", // 轨道采集-可燃冰
+  "speed1_4", // 轨道采集-氢(巨冰)
+  "gzSpeed", // 临界光子每分钟产量
+  "pointLength", // 小数点后保留位数
+  "speed1_5", // 传送带堆叠层数
+  "csd", // 传送带类型
+  "compactLayout",
+  "upgradeConveyorBelt",
+  "onlyConveyorBeltMk3",
+  "onlySorterMk3",
+  "onlyConveyorBeltMk3Downgrade",
+  "generateTeslaTower",
+  "teslaTowerLineInterval",
+  "conveyorBeltStackLayer",
+  "maxLabLayers",
+  "teslaTowerInterval",
+  "x_y_ratio",
+  // 顶部全局选项
+  "hideSource",
+  "selmodein",
+  "furnace",
+  "chemical",
+  "accType",
+  "accValue",
+  "research",
+  "selfAcc",
+  "isAddSelfAccP",
+  "showMaxOneBelt",
+];
+
+// 组装成 { id: value }，checkbox 存 0/1
+function collectParams() {
+  var o = {};
+  for (var i = 0; i < PARAM_IDS.length; i++) {
+    var el = document.getElementById(PARAM_IDS[i]);
+    if (!el) continue;
+    o[PARAM_IDS[i]] = el.type === "checkbox" ? (el.checked ? 1 : 0) : el.value;
+  }
+  return o;
+}
+
+// 清理全部数据（如「修复计算空白」）时置为 true，避免 beforeunload 又把旧参数写回去
+var PARAMS_SKIP_SAVE = false;
+
+function saveParams() {
+  if (PARAMS_SKIP_SAVE) return;
+  try {
+    var o = collectParams();
+    // 显式记录临界光子产量是否处于「手动指定」状态（旧存档没有此标记则视为自动）
+    o.__gzManual = manualGzSpeed ? 1 : 0;
+    saveData(PARAMS_KEY, JSON.stringify(o));
+  } catch (e) {
+    // 存不下（隐私模式等）就算了，不影响计算
+  }
+}
+
+function loadParams() {
+  var raw = null;
+  try {
+    raw = getData(PARAMS_KEY);
+  } catch (e) {
+    return false;
+  }
+  if (!raw) return false;
+  var o;
+  try {
+    o = JSON.parse(raw);
+  } catch (e) {
+    return false;
+  }
+  if (!o || typeof o !== "object") return false;
+
+  for (var i = 0; i < PARAM_IDS.length; i++) {
+    var id = PARAM_IDS[i];
+    var el = document.getElementById(id);
+    if (!el || !(id in o)) continue;
+    var v = o[id];
+    if (el.type === "checkbox") {
+      el.checked = !!v;
+    } else if (el.tagName === "SELECT") {
+      // 选项可能随游戏版本变化，值不匹配就跳过
+      var ok = false;
+      for (var j = 0; j < el.options.length; j++) {
+        if (el.options[j].value == v) {
+          ok = true;
+          break;
+        }
+      }
+      if (ok) el.value = v;
+    } else {
+      // 数字/文本输入：空值或 NaN 直接跳过，避免把计算参数弄坏
+      if (v === "" || v === null || v === undefined) continue;
+      if (el.type === "number" && isNaN(parseFloat(v))) continue;
+      el.value = v;
+    }
+  }
+
+  // 同步依赖这些参数的脚本全局变量
+  var pl = parseInt($("#pointLength").val(), 10);
+  if (!isNaN(pl) && pl >= 0 && pl <= 6) pointLength = pl;
+  if ($("#accType").length && $("#accType").val()) defaultAccType = $("#accType").val();
+  if ($("#accValue").length && $("#accValue").val()) defaultAccValue = $("#accValue").val();
+
+  // 临界光子产量：只有存档里带 __gzManual 标记才是真正的「手动指定」。
+  // （不能用「值 != 默认值」判断：老版本默认 5 且会被整体存档，会误判成手动）
+  var gzv = parseFloat($("#gzSpeed").val());
+  manualGzSpeed = o.__gzManual === 1 && !isNaN(gzv) && gzv > 0;
+  // 非手动状态时把输入框显示归位到默认值（老存档里可能还留着旧默认 5，容易误导）
+  if (!manualGzSpeed && PARAM_DEFAULTS && PARAM_DEFAULTS.gzSpeed !== undefined) {
+    $("#gzSpeed").val(PARAM_DEFAULTS.gzSpeed);
+  }
+  return true;
+}
+
+// 任何参数变化就存一次；离开页面时再补存一次（防止输入框还没失焦就关掉）
+function bindParamsAutoSave() {
+  $(document).on("change", function (e) {
+    var el = e && e.target;
+    if (el && el.id && $.inArray(el.id, PARAM_IDS) !== -1) saveParams();
+  });
+  $(window).on("beforeunload", saveParams);
+}
+
+// ---------- 恢复默认参数 ----------
+// 页面加载时（回填上次参数之前）记录各控件的初始值，作为“默认值”快照
+var PARAM_DEFAULTS = null;
+
+function captureParamDefaults() {
+  if (PARAM_DEFAULTS) return;
+  var o = {};
+  for (var i = 0; i < PARAM_IDS.length; i++) {
+    var el = document.getElementById(PARAM_IDS[i]);
+    if (!el) continue;
+    o[PARAM_IDS[i]] = el.type === "checkbox" ? (el.checked ? 1 : 0) : el.value;
+  }
+  PARAM_DEFAULTS = o;
+}
+
+// 把控件回填成默认值（不触发 change，由调用方统一触发计算）
+function applyParamDefaults() {
+  captureParamDefaults();
+  for (var i = 0; i < PARAM_IDS.length; i++) {
+    var id = PARAM_IDS[i];
+    var el = document.getElementById(id);
+    if (!el || !(id in PARAM_DEFAULTS)) continue;
+    var v = PARAM_DEFAULTS[id];
+    if (el.type === "checkbox") {
+      el.checked = !!v;
+    } else {
+      el.value = v;
+    }
+  }
+
+  // 同步依赖这些参数的脚本全局变量
+  var pl = parseInt($("#pointLength").val(), 10);
+  if (!isNaN(pl) && pl >= 0 && pl <= 6) pointLength = pl;
+  if ($("#accType").length && $("#accType").val())
+    defaultAccType = $("#accType").val();
+  if ($("#accValue").length && $("#accValue").val())
+    defaultAccValue = $("#accValue").val();
+}
+
+function resetParams() {
+  // 清掉已保存的参数，下次打开就按默认值来
+  try {
+    if (window.localStorage) localStorage.removeItem(PARAMS_KEY);
+  } catch (e) {
+    // 隐私模式等场景忽略
+  }
+  applyParamDefaults();
+  // 临界光子产量回到默认 → 同时退出「手动指定」状态，恢复按公式自动计算
+  manualGzSpeed = false;
+
+  // 让默认值真正作用到设备速度、机器选择与计算结果
+  $("#selore, #speed1_6, #fractionatorSpeed, #oilSpeed").trigger("change");
+  $(
+    "#selmodein, #furnace, #chemical, #research, #accType, #accValue, #hideSource, #selfAcc"
+  ).trigger("change");
+  update_all();
+}
+
+function bindResetParamsButton() {
+  $("#btnResetParams").on("click", function () {
+    var btn = $(this);
+    resetParams();
+    btn.addClass("done").text("已恢复默认");
+    clearTimeout(btn.data("resetTimer"));
+    btn.data(
+      "resetTimer",
+      setTimeout(function () {
+        btn.removeClass("done").text("恢复默认参数");
+      }, 1500)
+    );
+  });
+}
+
 //获取配方默认的机器
 function getMachine(arg) {
   var item = typeof arg == "string" ? find(arg) : arg;
@@ -4635,6 +5244,14 @@ function getSelectedBeltSpeedPerMinute() {
   return belt && belt.transportSpeed ? belt.transportSpeed * 60 : 1800;
 }
 
+// 临界光子由射线接收塔直接接收，不吃增产剂：既不能「加速」也不能「增产」，
+// 界面只保留「无」，计算里也强制按「无」处理（防止旧存档里的加速设置生效）。
+function isAccForbidden(arg) {
+  var item = typeof arg === "string" ? find(arg) : arg;
+  if (!item) return false;
+  if (item.name === "临界光子") return true;
+  return !!(item.s && item.s[0] && item.s[0].name === "临界光子");
+}
 function getPfTitle(item, info) {
   var title = [];
   var speed1_5 = parseFloat($("#speed1_5").val());
@@ -5011,9 +5628,11 @@ function f_init() {
     update_all();
   });
   $("#gzSpeed").change(function () {
-    manualGzSpeed = true;
+    // 手动输入的临界光子产量：改过一次就一直按手动值计算（不再在本次计算后失效），
+    // 直到点「恢复默认参数」把它改回默认值。
+    var v = parseFloat($(this).val());
+    manualGzSpeed = !isNaN(v) && v > 0;
     update_all();
-    manualGzSpeed = false;
   });
 
   /*产量：可燃冰 0.65/s 氢0.25/s
@@ -5086,7 +5705,7 @@ function f_init() {
   });
 
   $("#btnReset1").click(function () {
-    if (confirm("该操作将清除配方并刷新页面！")) {
+    if (confirm("该操作将清除配方、清除参数、修复计算器空白并刷新页面！")) {
       //重置设备
       settings = {};
       saveSetting();
@@ -5096,6 +5715,11 @@ function f_init() {
       //重置配方
       settings_pf = {};
       saveSettingPf();
+      //参数设置也一并恢复默认：先回填默认值，并阻止关闭前把旧参数写回
+      PARAMS_SKIP_SAVE = true;
+      applyParamDefaults();
+      // 临界光子产量也回到默认自动值
+      manualGzSpeed = false;
       //刷新数据
       update_all();
       //清空localStorage
@@ -5272,11 +5896,82 @@ function f_init() {
       });
     }
   });
+
+  // 恢复上次保存的参数设置，并让这些数值真正作用到设备速度与计算
+  captureParamDefaults();
+  loadParams();
+  bindParamsAutoSave();
+  bindResetParamsButton();
+  $("#selore, #speed1_6, #fractionatorSpeed, #oilSpeed").trigger("change");
+  update_all();
 }
 
 var single_list = []; //独立生产
 var xh_list = [];
 var out_list = [];
+
+// ---------- 副产物抵扣（净需求合并） ----------
+// creditLeft: 本轮展开时，每种物品还能用「同名副产物」抵扣多少需求
+// usedCredit: 本轮实际抵扣量（正数），用于展示「由副产提供多少」
+var creditLeft = {};
+var usedCredit = {};
+
+// 从需求 n 中扣除可用的副产物额度，返回抵扣后仍需自产的需求量
+function takeCredit(name, n) {
+  if (!(n > 0)) return n;
+  var left = creditLeft[name];
+  if (!left) return n;
+  var used = left < n ? left : n;
+  creditLeft[name] = left - used;
+  usedCredit[name] = (usedCredit[name] || 0) + used;
+  return n - used;
+}
+
+// 根据当前展开结果，统计每种物品可被副产物抵扣的额度
+// 额度 = min(副产盈余, 同名正需求)
+function computeCredit() {
+  var credit = {};
+  for (var i = 0; i < out_list.length; i++) {
+    var out = out_list[i];
+    if (!(out.value < 0)) continue; // 只有负值（盈余）可抵扣
+    var demand = 0;
+    for (var j = 0; j < xh_list.length; j++) {
+      if (xh_list[j].name == out.name) {
+        demand = xh_list[j].value;
+        break;
+      }
+    }
+    if (!(demand > 0)) continue;
+    var c = Math.min(-out.value, demand);
+    if (c > 1e-9) credit[out.name] = c;
+  }
+  return credit;
+}
+
+function hasCredit(credit) {
+  for (var k in credit) {
+    if (credit[k] > 1e-9) return true;
+  }
+  return false;
+}
+
+// 抵扣结算：把已抵扣的量从副产盈余里扣掉，剩下的才是真正多余；
+// 极端情况下若「抵得比产得多」，把多抵的那部分补回需求
+function settleCredit() {
+  for (var i = 0; i < out_list.length; i++) {
+    var out = out_list[i];
+    var used = usedCredit[out.name] || 0;
+    if (!(used > 0)) continue;
+    var available = -out.value;
+    if (used > available) {
+      addXH(out.name, used - available);
+      used = available > 0 ? available : 0;
+    }
+    out.used = used;
+    out.value += used;
+    if (Math.abs(out.value) < 1e-9) out.value = 0;
+  }
+}
 
 function addXH(name, value) {
   for (var i = 0; i < xh_list.length; i++) {
@@ -5331,6 +6026,13 @@ function loadNumber(itemName, n) {
     ) {
       return;
     }
+    // 先用同名副产物抵扣需求：被抵扣的部分既不用建产线，也不用展开它的原料
+    n = takeCredit(itemName, n);
+    if (n === 0) {
+      // 需求被同名副产完全抵扣：保留一行 0 净需求，用于展示「副产抵扣」
+      addXH(itemName, 0);
+      return;
+    }
     var item = find(itemName, true); // [normalize_recipe=true]
     var info = getValue(itemName);
 
@@ -5343,6 +6045,8 @@ function loadNumber(itemName, n) {
     }
     var accType = (settings[item.id] || {}).accType || defaultAccType;
     var accValue = (settings[item.id] || {}).accValue || defaultAccValue;
+    // 临界光子不吃增产剂，界面已禁止选择「加速/增产」，这里再兜一层，防止旧存档的设置在计算里生效
+    if (isAccForbidden(item)) accValue = "无";
     var accTotal = 0;
     for (var i = 0; item.q && i < item.q.length; i++) {
       var q = item.q[i];
@@ -5490,43 +6194,37 @@ function checkResult() {
 
 //每分钟需求: 引力透镜=0.1*接收塔=0.1*光子需求量/光子产量, 光子产量: 12(透镜×200%)/15(增产Ⅰ×250%)/18(增产Ⅱ×300%)/24(增产Ⅲ×400%)
 function fixGzSpeed() {
-  let fixedGzSpeed;
+  // 先把这次的临界光子产能算出来（只算一次，避免多条配方互相污染）
+  var fixedGzSpeed;
+  if (manualGzSpeed) {
+    fixedGzSpeed = parseFloat($("#gzSpeed").val());
+  }
+  if (!(fixedGzSpeed > 0)) {
+    // 临界光子不吃增产剂（isAccForbidden），正常恒为 12/min；
+    // 保留加速档位的取值，万一以后放开限制也能直接用。
+    var gzItem = find("临界光子", true);
+    var gzAccType = (settings[gzItem.id] || {}).accType || defaultAccType;
+    var gzAccValue = (settings[gzItem.id] || {}).accValue || defaultAccValue;
+    if (isAccForbidden(gzItem)) gzAccValue = "无";
+    if (gzAccValue === "加速") {
+      if (gzAccType === "增产剂Mk.Ⅱ") fixedGzSpeed = 18;
+      else if (gzAccType === "增产剂Mk.Ⅲ") fixedGzSpeed = 24;
+      else fixedGzSpeed = 15;
+    } else {
+      fixedGzSpeed = 12;
+    }
+  }
   $(data).each(function () {
     if (this.s && this.s[0].name == "临界光子") {
-      if (this.m) {
-        for (var i = 0; i < this.m.length; i++) {
-          if (this.m[i].name == "射线接收塔") {
-            for (var j = 0; j < this.q.length; j++) {
-              if (this.q[j].name == "引力透镜") {
-                if (manualGzSpeed) {
-                  fixedGzSpeed = parseFloat($("#gzSpeed").val());
-                } else {
-                  item = find("临界光子", true);
-                  accType = (settings[item.id] || {}).accType || defaultAccType;
-                  accValue =
-                    (settings[item.id] || {}).accValue || defaultAccValue;
-                  if (accValue === "加速") {
-                    switch (accType) {
-                      case "增产剂Mk.Ⅰ":
-                        fixedGzSpeed = 15;
-                        break;
-                      case "增产剂Mk.Ⅱ":
-                        fixedGzSpeed = 18;
-                        break;
-                      case "增产剂Mk.Ⅲ":
-                        fixedGzSpeed = 24;
-                        break;
-                    }
-                  } else {
-                    fixedGzSpeed = 12;
-                  }
-                }
-                this.q[j].n = (0.1 / fixedGzSpeed).toFixed(6);
-              }
-            }
-            this.t = this.q && this.q.length ? 60 / fixedGzSpeed : 10;
+      if (!this.m) return;
+      for (var i = 0; i < this.m.length; i++) {
+        if (this.m[i].name != "射线接收塔") continue;
+        for (var j = 0; j < this.q.length; j++) {
+          if (this.q[j].name == "引力透镜") {
+            this.q[j].n = (0.1 / fixedGzSpeed).toFixed(6);
           }
         }
+        this.t = this.q && this.q.length ? 60 / fixedGzSpeed : 10;
       }
     }
   });
@@ -5534,40 +6232,60 @@ function fixGzSpeed() {
 
 function update_all() {
   var outResult = [];
-  xh_list = [];
-  out_list = [];
-  single_list = [];
 
-  fixGzSpeed();
-  for (var m = 0; m < singleMake.length; m++) {
-    var item = data[singleMake[m].id]; //配方
-    var info = getValue(item);
-    var times = parseFloat(
-      (
-        (60 * parseInt(singleMake[m].number) * info.speed) /
-        (item.t || 1)
-      ).toFixed(6)
-    );
-    // (60 * parseInt(singleMake[m].number) * info.speed) / (item.t || 1);
+  // 需求展开（可重复执行：清空结果后按当前抵扣额度重新展开）
+  function expandDemand() {
+    xh_list = [];
+    out_list = [];
+    single_list = [];
 
-    for (var i = 0; i < item.s.length; i++) {
-      single_list.push({
-        id: singleMake[m].id,
-        number: singleMake[m].number,
-        name: item.s[i].name,
-        mName: info.name,
-        value: times * (item.s[i].n || 1),
-      });
-      loadNumber(item.s[i].name, -1 * times * (item.s[i].n || 1));
+    fixGzSpeed();
+    for (var m = 0; m < singleMake.length; m++) {
+      var item = data[singleMake[m].id]; //配方
+      var info = getValue(item);
+      var times = parseFloat(
+        (
+          (60 * parseInt(singleMake[m].number) * info.speed) /
+          (item.t || 1)
+        ).toFixed(6)
+      );
+      // (60 * parseInt(singleMake[m].number) * info.speed) / (item.t || 1);
+
+      for (var i = 0; i < item.s.length; i++) {
+        single_list.push({
+          id: singleMake[m].id,
+          number: singleMake[m].number,
+          name: item.s[i].name,
+          mName: info.name,
+          value: times * (item.s[i].n || 1),
+        });
+        loadNumber(item.s[i].name, -1 * times * (item.s[i].n || 1));
+      }
+      for (var j = 0; item.q && j < item.q.length; j++) {
+        loadNumber(item.q[j].name, times * (item.q[j].n || 1));
+      }
     }
-    for (var j = 0; item.q && j < item.q.length; j++) {
-      loadNumber(item.q[j].name, times * (item.q[j].n || 1));
+    for (var m = 0; m < xqs.length; m++) {
+      var currentItem = xqs[m].item;
+      loadNumber(currentItem.name, xqs[m].number);
     }
   }
-  for (var m = 0; m < xqs.length; m++) {
-    var currentItem = xqs[m].item;
-    loadNumber(currentItem.name, xqs[m].number);
+
+  // 第一轮：不做抵扣，先摸清每种物品的副产盈余有多少
+  creditLeft = {};
+  usedCredit = {};
+  expandDemand();
+
+  // 第二轮：把副产盈余记成额度，展开时直接抵掉同名需求
+  // 例：精炼油 60/min 副产氢 30/min，此时氢需求 60 只需再补 30 → 0.5 台采集器
+  var credit = computeCredit();
+  if (hasCredit(credit)) {
+    creditLeft = credit;
+    usedCredit = {};
+    expandDemand();
   }
+  creditLeft = {};
+  settleCredit();
 
   function isXqs(name) {
     for (var m = 0; m < xqs.length; m++) {
@@ -5590,7 +6308,11 @@ function update_all() {
       var accType = (settings[item.id] || {}).accType || defaultAccType;
       var accValue = (settings[item.id] || {}).accValue || defaultAccValue;
       if (accValue == "增产" && item.noExtra) accValue = "无";
-      if (item.q.length == 0) accValue = "无";
+      // noExtra === null 表示该配方完全不吃增产剂（如「蓄电池满」），
+      // 之前只在这里判断 q.length，会和 loadNumber 里的原料展开判断不一致，
+      // 导致设备数被多除以 1.125/1.25 而原料却没减少。
+      if (item.q.length == 0 || item.noExtra === null) accValue = "无";
+      if (isAccForbidden(item)) accValue = "无";
 
       if (item.name !== "临界光子" || item.mName !== "射线接收塔") {
         // 修正产物与需求物相同时，生产设备计算偏少
@@ -5675,7 +6397,9 @@ function update_all() {
   }
 
   for (var i = 0; i < xh_list.length; i++) {
-    if (!xh_list[i].value) continue;
+    // 需求被同名副产完全抵扣时 value 为 0，但该行仍需展示（显示原始需求 + 抵扣徽章）
+    var creditUsed = usedCredit[xh_list[i].name] || 0;
+    if (!xh_list[i].value && !(creditUsed > 0)) continue;
 
     var item = find(xh_list[i].name);
     var info = getValue(xh_list[i].name);
@@ -5691,7 +6415,10 @@ function update_all() {
     // 当生产精炼油/氢/石墨烯/重氢的生产设施为空时，显示0生产设施以跳过“存在生产设施为空的配方”检验
     var outitem = {
       name: xh_list[i].name,
-      number1: xh_list[i].value.toFixed(pointLength),
+      // 需求列显示原始总需求（净需求 + 被副产抵扣的部分），未抵扣时即净需求
+      number1: (xh_list[i].value + (creditUsed > 0 ? creditUsed : 0)).toFixed(
+        pointLength
+      ),
       number2: xh_list[i].value2
         ? xh_list[i].value2.toFixed(pointLength)
         : ["精炼油", "氢", "石墨烯", "重氢"].includes(xh_list[i].name)
@@ -5717,6 +6444,13 @@ function update_all() {
       accValue: [],
       accTotal: (xh_list[i].accTotal || 0).toFixed(2),
     };
+    // 由副产物抵扣掉的需求量（creditUsed 已在循环开头取得）
+    if (creditUsed > 0) {
+      outitem.creditNote =
+        "<span class='credit-note'>副产抵扣 " +
+        creditUsed.toFixed(pointLength) +
+        "</span>";
+    }
     if (!outitem.number2) outitem.number2full = "";
     if (xh_list[i].name == "太阳帆") {
       outitem.numberOther =
@@ -5726,7 +6460,13 @@ function update_all() {
       outitem.numberOther =
         "(可供" + getIconShow("垂直发射井", outitem.number1 / 5) + ")";
     }
-    addTotal(info.name, Math.ceil(outitem.number2), settings[item.id]);
+    // 合计按真实设备数向上取整：不能用格式化后的字符串（保留 0 位小数时 "0" 会被当成 0 台，
+    // 导致「合计」整块空白），也不能用 number2 的显示值兜底。
+    addTotal(
+      info.name,
+      Math.ceil(xh_list[i].value2 > 0 ? xh_list[i].value2 : 0),
+      settings[item.id]
+    );
     // 增产剂总和
     if (info.accValue != "无") {
       // TODO: 这里调用Math.ceil未必合理，增产剂一般放在总线起始处，所以应该在最终算出的总和处调用Math.ceil
@@ -5772,6 +6512,7 @@ function update_all() {
     var accValue = (settings[item.id] || {}).accValue || defaultAccValue;
     if (accValue == "增产" && item.noExtra) accValue = "无";
     if (item.q.length == 0 || item.noExtra === null) accValue = "无";
+    if (isAccForbidden(item)) accValue = "无";
 
     ["增产剂Mk.Ⅰ", "增产剂Mk.Ⅱ", "增产剂Mk.Ⅲ"].forEach(function (one) {
       outitem.accType.push({
@@ -5790,6 +6531,8 @@ function update_all() {
     ["无", "加速", "增产"].forEach(function (one) {
       if (one != "无" && (item.q.length == 0 || item.noExtra === null)) return;
       if (one == "增产" && item.noExtra) return;
+      // 临界光子由射线接收塔直接接收，增产剂无效 → 只保留「无」
+      if (one != "无" && isAccForbidden(item)) return;
       outitem.accValue.push({
         class: one == accValue ? "m selected" : "m",
         itemName: item.name,
@@ -5807,7 +6550,7 @@ function update_all() {
   }
 
   for (var i = 0; i < out_list.length; i++) {
-    if (!out_list[i].value) continue;
+    if (!out_list[i].value && !out_list[i].used) continue;
     var item = find(out_list[i].name);
     var info = getValue(out_list[i].name);
     var outitem = {
@@ -5824,13 +6567,33 @@ function update_all() {
       m: [],
       pf: [],
     };
+    if (out_list[i].used > 0) {
+      // 只有「该物品完全不用自产」时才能说无需额外生产；
+      // 部分抵扣时仍可能有自产设备（如精炼油60+氢45：副产抵30、自己产15）。
+      var selfMade = 0;
+      for (var k = 0; k < xh_list.length; k++) {
+        if (xh_list[k].name == out_list[i].name) {
+          selfMade = xh_list[k].value2 || 0;
+          break;
+        }
+      }
+      outitem.outNote =
+        out_list[i].value === 0 && !(selfMade > 0)
+          ? "<span class='out-note'>已全部用于抵扣同名需求，无需额外生产</span>"
+          : "<span class='out-note'>其中 " +
+            out_list[i].used.toFixed(pointLength) +
+            " 已用于抵扣同名需求</span>";
+    }
     items2.push(outitem);
   }
   app.items0 = items0;
   app.xqs = xqs;
   app.items = items;
   app.items2 = items2;
-  app.total = total;
+  // 合计不显示数量为 0 的设备（例如需求被副产完全抵扣时设备数为 0）
+  app.total = total.filter(function (t) {
+    return t.value > 0;
+  });
   app.ig_names = ig_names;
   var energy = 0;
   for (var i = 0; i < total.length; i++) {
@@ -6218,6 +6981,7 @@ function getRecipe() {
     ["钛晶石", "titaniumCrystal"],
     ["卡西米尔晶片", "casimirCrystal"],
     ["引力透镜", "gravitonLens"],
+	["黑雾引力透镜", "darkfoglens"],
     ["空间翘曲器", "spaceWarper"],
     ["湮灭约束球", "annihilationConstraintSphere"],
     ["推进器", "thruster"],
@@ -6333,6 +7097,8 @@ function getRecipe() {
   let blueprintTitle = "";
   let blueprintDesc = "";
   let blueprintIconIdx = [];
+  let noId = []; // 没有游戏 ID 的物品、配方
+  let unsupported = "";
   for (let tr of document.getElementsByTagName("tbody")[0].childNodes) {
     if (tr.className === "header") {
       continue;
@@ -6384,6 +7150,7 @@ function getRecipe() {
     let input = [];
     let output = [];
     let recipeId = 0;
+    let cnNames = [[], []]; // 配方的原料、产物（中文名）
     let isInput = true;
     const t = parseFloat(recipeHtml.innerText.split("(")[1].split("s")[0]);
     for (let node of recipeHtml.childNodes) {
@@ -6405,12 +7172,9 @@ function getRecipe() {
           success = true;
           break;
         }
-        if (!success) {
-          // alert(`item map error: ${cnTitle}`)
-          let msg = `item map error: ${cnTitle}`;
-          cocoMessage.error(msg);
-          throw msg;
-        }
+        if (!itemMap[title]) title = cnTitle; // 不在上面的表里（或 itemMap 没有）：用中文名（itemMap 按 GAME_ITEM_IDS 补）
+        if (!(itemMap[title] && itemMap[title].iconId) && noId.indexOf(cnTitle) < 0) noId.push(cnTitle);
+        cnNames[isInput ? 0 : 1].push(cnTitle);
         if (isInput) {
           input.push({ name: title });
         } else {
@@ -6464,6 +7228,12 @@ function getRecipe() {
       if (output[0].name === "hydrogen") {
         inputHasHydrogen = true;
       }
+    } else {
+      // 游戏配方 ID：data.js 里这个物品选的配方的 gameId
+      recipeId = (find(nodeList[1].getAttribute("data-name")) || {}).gameId || 0;
+      let pfName = cnNames[0].join("+") + "->" + cnNames[1].join("+");
+      if (!recipeId && buildingMap[building.name]) noId.push(`配方 ${pfName}`);
+      else if (!recipeId && !unsupported) unsupported = pfName;
     }
 
     if (!blueprintTitle) {
@@ -6537,6 +7307,17 @@ function getRecipe() {
       }
     }
   }
+  if (unsupported) {
+    cocoMessage.warning(
+      `包含不支持的配方: ${unsupported}，<br/>请排除对应物品（目前只支持通过(位面)熔炉、制造台、精炼厂、对撞机、（量子）化工厂、研究站六类生产设施进行制造的物品）`,
+      5000
+    );
+    return null;
+  }
+  if (noId.length) {
+    cocoMessage.warning(`这些还没有游戏 ID，暂时生成不了：${noId.join("、")}<br/>（data.js 里配方写 gameId、产物写 itemId）`, 5000);
+    return null;
+  }
   // console.log(recipeList)
   return {
     recipeList: recipeList,
@@ -6547,12 +7328,96 @@ function getRecipe() {
   };
 }
 
-function generateBlueprint() {
+
+// 生成蓝图[无带流]：也跳到手搓产线蓝图页，标成无带的（Scripts/handcraft-link.js）。原来的生成方法改名留在下面，不再接到按钮上
+function generateBlueprint1() {
+  openHandcraft(true);
+}
+function generateBlueprint1Legacy() { // 无带流蓝图
   if (!location.href.startsWith("https")) {
     cocoMessage.warning("请使用 https 协议访问以启用复制到剪切板功能");
     return;
   }
   const recipe = getRecipe();
+  if (!recipe) return;
+  const outputRecipe = {
+    proliferator: recipe.proliferator,
+    subRecipes: recipe.recipeList,
+  };
+  // console.log(JSON.stringify(outputRecipe))
+  //{"subRecipes":[{"building":{"name":"assemblingMachineMk1","num":0.7},"output":[{"name":"magneticCoil","rate":2}],"input":[{"name":"magnet","rate":2},{"name":"copperIngot","rate":1}],"acceleratorMode":0,"recipeID":0},{"building":{"name":"arcSmelter","num":1.5},"output":[{"name":"magnet","rate":0.6666666666666666}],"input":[{"name":"ironOre","rate":0.6666666666666666}],"acceleratorMode":0,"recipeID":0},{"building":null,"output":[{"name":"ironOre","rate":1}],"input":null,"acceleratorMode":0,"recipeID":0},{"building":{"name":"arcSmelter","num":0.5},"output":[{"name":"copperIngot","rate":1}],"input":[{"name":"copperOre","rate":1}],"acceleratorMode":0,"recipeID":0},{"building":null,"output":[{"name":"copperOre","rate":0.5}],"input":null,"acceleratorMode":0,"recipeID":0}]}
+  if (!outputRecipe.subRecipes) {
+    return;
+  }
+  let config = {
+    maxSorterNumOneBelt: 8, // 一个传送带节点连接的最大分拣器数量
+    conveyorBeltStackLayer: parseInt(
+      document.getElementById("conveyorBeltStackLayer").value
+    ), // 传送带物品最大堆叠层数
+    x_y_ratio: parseFloat(document.getElementById("x_y_ratio").value), // 长宽比
+    // compactLayout: document.getElementById('compactLayout').checked,  // 是否采用紧凑布局（紧凑布局的蓝图中炼油厂、化工厂和对撞机在布局上会更紧凑，适合摆放在赤道带，在高纬度可能会出现碰撞问题）
+    compactLayout: false,
+    upgradeConveyorBelt: false, // 360/min的运力时使用3级传送带（无带流情况下，原料的需求和供应都是集中处理，1级传送带满运力情况下可能会有运送不及时问题导致产量低于预期
+    onlyConveyorBeltMk3: document.getElementById("onlyConveyorBeltMk3").checked, // 是否只使用三级传送带
+    onlySorterMk3: document.getElementById("onlySorterMk3").checked, // 是否只使用三级传送带
+    maxLabLayers: parseInt(document.getElementById("maxLabLayers").value),
+    selfSpray: document.getElementById("selfAcc").checked, // 是否自喷涂增产剂
+    generateTeslaTower: document.getElementById("generateTeslaTower").checked, // 是否自动插电线杆
+    teslaTowerInterval: 10, // 同一排内电线杆距离
+    teslaTowerLineInterval: parseInt(
+      document.getElementById("teslaTowerLineInterval").value
+    ), // 电线杆间隔几排
+    // onlyConveyorBeltMk3Downgrade: document.getElementById('onlyConveyorBeltMk3Downgrade').checked  // 三级传送带运力降级
+    onlyConveyorBeltMk3Downgrade: false, // 三级传送带运力降级
+  };
+  // console.log(config)
+  let b1 = new Blueprint(
+    recipe.blueprintTitle,
+    recipe.blueprintIcon.concat(Array(5).fill(0)).slice(0, 5),
+    outputRecipe,
+    config
+  );
+  b1.init();
+  b1.generateBuildings();
+  b1.generateConveyorBelts();
+  b1.generateConveyorBeltsForSprayCoater();
+  b1.blueprintTemplate.buildings = b1.buildings;
+  b1.blueprintTemplate.header.desc = recipe.blueprintDesc.trimEnd();
+  switch (recipe.blueprintIcon.length) {
+    case 1:
+      b1.blueprintTemplate.header.layout = 10;
+      break;
+    case 2:
+      b1.blueprintTemplate.header.layout = 20;
+      break;
+    case 3:
+      b1.blueprintTemplate.header.layout = 30;
+      break;
+    case 4:
+      b1.blueprintTemplate.header.layout = 40;
+      break;
+    default:
+      b1.blueprintTemplate.header.layout = 51;
+      break;
+  }
+  navigator.clipboard
+    .writeText(b1.toStr())
+    .then((r) => cocoMessage.success("已复制到粘贴板", 1000));
+  // navigator.clipboard.writeText(JSON.stringify(b1.blueprintTemplate.buildings)).then(r => cocoMessage.success("已复制到粘贴板", 1000))
+}
+
+
+// 生成蓝图：跳到手搓产线蓝图页（Scripts/handcraft-link.js）。原来的生成方法改名留在下面，不再接到按钮上
+function generateBlueprint() {
+  openHandcraft();
+}
+function generateBlueprintLegacy() {
+  if (!location.href.startsWith("https")) {
+    cocoMessage.warning("请使用 https 协议访问以启用复制到剪切板功能");
+    return;
+  }
+  const recipe = getRecipe();
+  if (!recipe) return;
   const outputRecipe = {
     proliferator: recipe.proliferator,
     subRecipes: recipe.recipeList,

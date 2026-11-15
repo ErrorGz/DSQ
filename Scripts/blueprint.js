@@ -1,27 +1,27 @@
 //蓝图转JSON https://github.com/cying314/edit-dspblue-print
 const itemMap = {
 	water: { name: "沙土", iconId: 1099, remark: "沙土" },
-    water: { name: "water", iconId: 1000, remark: "水" },
-    ironOre: { name: "ironOre", iconId: 1001, remark: "铁矿" },
-    copperOre: { name: "copperOre", iconId: 1002, remark: "铜矿" },
-    siliconOre: { name: "siliconOre", iconId: 1003, remark: "硅石" },
-    titaniumOre: { name: "titaniumOre", iconId: 1004, remark: "钛石" },
-    coal: { name: "coal", iconId: 1006, remark: "煤矿" },
-    ironIngot: { name: "ironIngot", iconId: 1101, remark: "铁块" },
-    titaniumIngot: { name: "titaniumIngot", iconId: 1106, remark: "钛块" },
-    energeticGraphite: { name: "energeticGraphite", iconId: 1109, remark: "高级石墨" },
-    diamond: { name: "diamond", iconId: 1112, remark: "金刚石" },
-    proliferatorMk1: { name: "proliferatorMk1", iconId: 1141,extra_rate:0.125,accelerate:0.25, remark: "增产剂Mk.Ⅰ" },
-    proliferatorMk2: { name: "proliferatorMk2", iconId: 1142,extra_rate:0.2,accelerate:0.5, remark: "增产剂Mk.Ⅱ" },
-    proliferatorMk3: { name: "proliferatorMk3", iconId: 1143,extra_rate:0.25,accelerate:1, remark: "增产剂Mk.Ⅲ" },
-    gear: { name: "gear", iconId: 1201, remark: "齿轮" },
-    stone: { name: "stone", iconId: 1005, remark: "石矿" },
-    oil: { name: "oil", iconId: 1007, remark: "原油" },
-    refinedOil: { name: "refinedOil", iconId: 1114, remark: "精炼油" },
-    sulfuricAcid: { name: "sulfuricAcid", iconId: 1116, remark: "硫酸" },
-    hydrogen: { name: "hydrogen", iconId: 1120, remark: "氢" },
-    hydrogenOutput: { name: "hydrogenOutput", iconId: 1120, remark: "氢" },
-    fireIce: { name: "fireIce", iconId: 1011, remark: "可燃冰" },
+    water: { name: "water", remark: "水" },
+    ironOre: { name: "ironOre", remark: "铁矿" },
+    copperOre: { name: "copperOre", remark: "铜矿" },
+    siliconOre: { name: "siliconOre", remark: "硅石" },
+    titaniumOre: { name: "titaniumOre", remark: "钛石" },
+    coal: { name: "coal", remark: "煤矿" },
+    ironIngot: { name: "ironIngot", remark: "铁块" },
+    titaniumIngot: { name: "titaniumIngot", remark: "钛块" },
+    energeticGraphite: { name: "energeticGraphite", remark: "高级石墨" },
+    diamond: { name: "diamond", remark: "金刚石" },
+    proliferatorMk1: { name: "proliferatorMk1", extra_rate:0.125,accelerate:0.25, remark: "增产剂Mk.Ⅰ" },
+    proliferatorMk2: { name: "proliferatorMk2", extra_rate:0.2,accelerate:0.5, remark: "增产剂Mk.Ⅱ" },
+    proliferatorMk3: { name: "proliferatorMk3", extra_rate:0.25,accelerate:1, remark: "增产剂Mk.Ⅲ" },
+    gear: { name: "gear", remark: "齿轮" },
+    stone: { name: "stone", remark: "石矿" },
+    oil: { name: "oil", remark: "原油" },
+    refinedOil: { name: "refinedOil", remark: "精炼油" },
+    sulfuricAcid: { name: "sulfuricAcid", remark: "硫酸" },
+    hydrogen: { name: "hydrogen", remark: "氢" },
+    hydrogenOutput: { name: "hydrogenOutput", remark: "氢" },
+    fireIce: { name: "fireIce", remark: "可燃冰" },
     //wood: { name: 'wood', iconId: 1030, remark: '木材' },
     //plant_fuel: { name: 'plant_fuel', iconId: 1031, remark: '植物燃料' },
     kimberliteOre: { name: "kimberliteOre", iconId: 1012, remark: "金伯利矿石" },
@@ -178,6 +178,9 @@ const itemMap = {
     templateItem: { name: "templateItem", iconId: 0, remark: "模板" },
 	//itemId是在传送带中设置这个产物，然后转换成json来提取
 };
+// 物品 ID 以 data.js 的 GAME_ITEM_IDS 为准；那边新加的物品按中文名补进来
+for (const k in itemMap) if (GAME_ITEM_IDS[itemMap[k].remark]) itemMap[k].iconId = GAME_ITEM_IDS[itemMap[k].remark];
+for (const name in GAME_ITEM_IDS) if (!itemMap[name]) itemMap[name] = { name: name, iconId: GAME_ITEM_IDS[name], remark: name };
 const productionCategory = {
   smelter: 0,
   assembling: 1,
@@ -673,48 +676,18 @@ class Blueprint {
   }
 
   mapRecipeID() {
+    // 配方 ID 在 data.js 的 getRecipe 里按 data.js 的 gameId 填好了
     for (let subRecipe of this.recipe.subRecipes) {
       if (!subRecipe.input) {
         // 原料
         continue;
       }
-      let recipeStr = "";
-      let isFirst = true;
-      for (let item of subRecipe.input) {
-        if (isFirst) {
-          recipeStr = item.name;
-          isFirst = false;
-        } else {
-          recipeStr += "+" + item.name;
-        }
-      }
-      isFirst = true;
-      for (let item of subRecipe.output) {
-        if (isFirst) {
-          recipeStr += "=" + item.name;
-          isFirst = false;
-        } else {
-          recipeStr += "+" + item.name;
-        }
-      }
-      if (!recipeMap[recipeStr] || recipeMap[recipeStr] === -1) {
-        cocoMessage.warning(
-          `包含不支持的配方: ${recipeStr.replace(
-            "=",
-            "->"
-          )}，<br/>请排除对应物品（目前只支持通过(位面)熔炉、制造台、精炼厂、对撞机、（量子）化工厂、研究站六类生产设施进行制造的物品）`,
-          5000
-        );
-        throw `unknown recipe - ${recipeStr} ${subRecipe}`;
-      }
-      if ([58, 121].includes(recipeMap[recipeStr])) {
+      if ([58, 121].includes(subRecipe.recipeID)) {
         cocoMessage.warning(
           `X射线裂解(制氢)与重整精炼(制精炼油)可能需手动提供初始启动的精炼油/氢`,
           5000
         );
-        //throw `unknown recipe - ${recipeStr} ${subRecipe}`;
       }
-      subRecipe.recipeID = recipeMap[recipeStr];
     }
   }
 
