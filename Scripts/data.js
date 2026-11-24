@@ -5166,16 +5166,99 @@ function f_fillData() {
   //    $("#selore").append("<option value='" + i / 100 + "'>" + i + "%</option>");
   //}
 }
+// 配方抵消后允许的浮点误差，避免 0.99 - 0.99 的残余值被当成有效产物
+var RECIPE_EPSILON = 1e-9;
+
+// 在副本上补齐数量并抵消同名投入、产出，不修改原始配方数据
+function normalizeRecipe(item) {
+  var outputs = item.s || [];
+  var inputs = item.q || [];
+  for (var i = 0; i < outputs.length; i++) {
+    if (
+      outputs[i].n === undefined ||
+      outputs[i].n === null ||
+      outputs[i].n === ""
+    ) {
+      outputs[i].n = 1;
+    }
+  }
+  for (var i = 0; i < inputs.length; i++) {
+    if (
+      inputs[i].n === undefined ||
+      inputs[i].n === null ||
+      inputs[i].n === ""
+    ) {
+      inputs[i].n = 1;
+    }
+  }
+
+  for (var i = 0; i < outputs.length; i++) {
+    for (var j = 0; j < inputs.length; j++) {
+      if (outputs[i].name != inputs[j].name) continue;
+      var toCancel = Math.min(outputs[i].n, inputs[j].n);
+      outputs[i].n -= toCancel;
+      inputs[j].n -= toCancel;
+      if (Math.abs(outputs[i].n) <= RECIPE_EPSILON) outputs[i].n = 0;
+      if (Math.abs(inputs[j].n) <= RECIPE_EPSILON) inputs[j].n = 0;
+    }
+  }
+
+  item.s = outputs.filter(function (output) {
+    return output.n > RECIPE_EPSILON;
+  });
+  item.q = inputs.filter(function (input) {
+    return input.n > RECIPE_EPSILON;
+  });
+}
+
+// 只有抵消后仍能净产出目标物品时，配方才算有效
+function getRecipeForItem(item, name, normalize_recipe) {
+  if (!item || !item.s) return null;
+  var hasOutput = false;
+  for (var i = 0; i < item.s.length; i++) {
+    if (item.s[i].name == name) {
+      hasOutput = true;
+      break;
+    }
+  }
+  if (!hasOutput) return null;
+
+  var normalized = $.extend(true, {}, item);
+  normalizeRecipe(normalized);
+
+  var output = null;
+  for (var i = 0; i < normalized.s.length; i++) {
+    if (normalized.s[i].name == name) {
+      output = normalized.s[i];
+      break;
+    }
+  }
+  if (!output) return null;
+
+  if (normalize_recipe) {
+    $.extend(normalized, output);
+    return normalized;
+  }
+
+  // 展示用调用仍返回原始投入产出，但选择有效性按净产出判断
+  var result = $.extend(true, {}, item);
+  for (var i = 0; i < result.s.length; i++) {
+    if (result.s[i].name == name) {
+      $.extend(result, result.s[i]);
+      break;
+    }
+  }
+  return result;
+}
+
 //找到这个物品的配方
 function getPfs(name) {
   var pfs = [];
   for (var i = 0; i < data.length; i++) {
     var item = data[i];
-    for (var j = 0; j < item.s.length; j++) {
-      if (item.s[j].name == name) {
-        var pf = $.extend(true, {}, item);
-        pfs.push(pf);
-      }
+    if (getRecipeForItem(item, name, true)) {
+      var pf = $.extend(true, {}, item);
+      pfs.push(pf);
     }
   }
   return pfs;
@@ -5308,69 +5391,25 @@ function getPfTitle(item, info) {
 //找到这个物品的配方(同时赋值s[XX]里的 t 和 n )
 // cancel out input and output when [normalize_recipe=true]
 function find(name, normalize_recipe) {
-  function get(item) {
-    var o = $.extend(true, {}, item);
-    if (normalize_recipe) {
-      // set undefined values to 1
-      for (var i = 0; i < o.s.length; i++) {
-        o.s[i].n = o.s[i].n || 1;
-      }
-      for (var i = 0; i < o.q.length; i++) {
-        o.q[i].n = o.q[i].n || 1;
-      }
-
-      // try to cancel out same components
-      for (var i = 0; i < o.s.length; i++) {
-        var s_name = o.s[i].name;
-        for (var j = 0; j < o.q.length; j++) {
-          if (s_name == o.q[j].name) {
-            // cancel out
-            var to_cancel = Math.min(o.s[i].n, o.q[j].n);
-            o.s[i].n -= to_cancel;
-            o.q[j].n -= to_cancel;
-          }
-        }
-      }
-
-      // remove those canceled to be zero
-      var o_s = o.s;
-      o.s = [];
-      for (var i = 0; i < o_s.length; i++) {
-        if (o_s[i].n === 0) continue;
-        o.s.push(o_s[i]);
-      }
-      var o_q = o.q;
-      o.q = [];
-      for (var i = 0; i < o_q.length; i++) {
-        if (o_q[i].n === 0) continue;
-        o.q.push(o_q[i]);
-      }
-    }
-
-    for (var j = 0; j < o.s.length; j++) {
-      if (o.s[j].name == name) {
-        $.extend(o, o.s[j]);
-        return o;
-      }
-    }
-
-    cocoMessage.warning("重氢分馏塔无法用于生产氢气。", 3000);
-    throw new Error("配方错误！可能是因为该配方净输出为负。");
-  }
-
   var pf = settings_pf[name];
-  if (pf) {
-    return get(data[parseInt(pf)]);
+  if (pf !== undefined && pf !== null && pf !== "") {
+    var index = Number(pf);
+    var selected =
+        isFinite(index) && Math.floor(index) === index ? data[index] : null;
+    var result = getRecipeForItem(selected, name, normalize_recipe);
+    if (result) return result;
+
+    // 旧存档可能使用错位、越界或零净产出的配方，清除后回退到有效默认配方
+    delete settings_pf[name];
+    saveSettingPf();
   }
 
   for (var i = 0; i < data.length; i++) {
-    var item = data[i];
-    for (var j = 0; j < item.s.length; j++) {
-      if (item.s[j].name == name) {
-        return get(item);
-      }
-    }
+    var item = getRecipeForItem(data[i], name, normalize_recipe);
+    if (item) return item;
   }
+
+  throw new Error("没有可用于生产“" + name + "”的有效配方。");
 }
 
 function f_add3(name) {
